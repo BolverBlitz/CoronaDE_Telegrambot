@@ -44,9 +44,11 @@ let getCorona = function getCorona() {
                     }
                 }
                 var KillMSG = "Nothing";
+				/*
                 if(deaths - LTarr[2] >= 2){var KillMSG = "Double Kill"}
                 if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
                 if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
+				*/
 
             var Output = {
                 confirmed: confirmed,
