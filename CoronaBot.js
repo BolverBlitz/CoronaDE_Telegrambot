@@ -43,12 +43,6 @@ let getCorona = function getCorona() {
                         }
                     }
                 }
-                var KillMSG = "Nothing";
-                /*
-                if(deaths - LTarr[2] >= 2){var KillMSG = "Double Kill"}
-                if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
-                if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
-                */
                
                 log(confirmed)
             var Output = {
@@ -58,10 +52,9 @@ let getCorona = function getCorona() {
                 recovereddiff: recovered - LTarr[1],
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
-                KillMSG: KillMSG,
                 Zeit: LTarr[3], //Alter Wert des letzten Posts aus File
                 ZeitStempelAlt: LTarr[4]/1000,
-                ZeitStempel: StandZeit/1000 //Neuer höchster Wert der aktuellen anfrage
+                ZeitStempel: StandZeit/1000 //Neuer höchster Wert der aktuellen Anfrage
                 };
                 fs.writeFile("current.csv", confirmed + "," + recovered + "," + deaths + "," + new Date().getTime() + "," + StandZeit, (err) => {if (err) console.log(err);
                     log("current.csv was written...")
@@ -95,12 +88,6 @@ let getCorona24 = function getCorona24() {
                         }
                     }
                 }
-                var KillMSG = "Nothing";
-                /*
-                if(deaths - LTarr[2] >= 2){var KillMSG = "Double Kill"}
-                if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
-                if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
-                */
 
             var Output = {
                 confirmed: confirmed,
@@ -109,7 +96,6 @@ let getCorona24 = function getCorona24() {
                 recovereddiff: recovered - LTarr[1],
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
-                KillMSG: KillMSG,
                 Zeit: LTarr[3]
                 };
                 resolve(Output);
@@ -134,10 +120,10 @@ let getCoronaFromFile = function getCoronaFromFile() {
     });
 }
 
-let getCoronaDeteil = function getCoronaDeteil() {
+let getCoronaDetail = function getCoronaDetail() {
     return new Promise(function(resolve, reject) {
         var Output = [];
-        log("Pushed: getCoronaDeteil");
+        log("Pushed: getCoronaDetail");
         request(url, (err, res, body) => {
                 var bodyarr = body.split(',')
                 //console.log(bodyarr.length)
@@ -162,7 +148,6 @@ let getCoronaDeteil = function getCoronaDeteil() {
 }
 
 /*----------------------Inline Handler--------------------------*/
-
 bot.on('inlineQuery', msg => {
 
     let query = msg.query;
@@ -201,7 +186,6 @@ bot.on('inlineQuery', msg => {
 });
 
 /*----------------------Callback for Buttons--------------------------*/
-
 bot.on('callbackQuery', (msg) => {
 	
 	if ('inline_message_id' in msg) {	
@@ -217,7 +201,7 @@ bot.on('callbackQuery', (msg) => {
             showAlert: false
         });
         let MSG = "Corona Deutschland:\n";
-        getCoronaDeteil().then(function(Corona) {
+        getCoronaDetail().then(function(Corona) {
 
             Corona.map((Corona) =>{
                 MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
@@ -293,7 +277,6 @@ function getHourDE(date) {
 }
 
 /*----------------------Trigger--------------------------*/
-
 setInterval(function(){
 
     if(getHourDE(new Date()) === '0000'){
@@ -313,14 +296,7 @@ setInterval(function(){
                 var minutes = "0" + date.getMinutes();
 
                 var formattedTime = day + "." + month + "." + year
-    
-                    if(Corona.KillMSG === "Nothing"){
-                    
-                        var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n#TäglicherReport " + formattedTime;
-                    }else{
-                        var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n-- " + Corona.KillMSG + " --\n\n#TäglicherReport " + formattedTime;
-                    }
-    
+                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n#TäglicherReport " + formattedTime;
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563
     
                     /*fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
@@ -349,14 +325,7 @@ setInterval(function(){
                     var minutes = "0" + date.getMinutes();
 
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-
-                    if(Corona.KillMSG === "Nothing")
-                    {
-                        var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
-                    }else{
-                        var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\n-- <b>' + Corona.KillMSG + ' --\n\nStand: ' + formattedTime + '</b>';
-                    }
-
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 
                     fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
@@ -366,7 +335,7 @@ setInterval(function(){
                 }else{
                     var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                     log(MessageOut)
-                    log("Timestamp in file war älter als Timestap der letzten änderung")
+                    log("Timestamp in Datei war älter als Timestamp der letzten Änderung")
                     console.log(Corona.ZeitStempel, Corona.ZeitSpempel)
                 }
           }
@@ -376,7 +345,7 @@ setInterval(function(){
 
 /*----------------------Start--------------------------*/
 bot.on(/^\/start$/i, (msg) => {
-    let MSG = "Dieser Bot postet updates zum Corona Virus im [Corona Deutschland Kanal](t.me/CoronaStats_DE), außerdem kannst du Ihn in jedem Chat als Inline Bot nutzen.\nKlicke einfach auf den Knopf unten, wähle einen Chat und klick auf das Feld."
+    let MSG = "Dieser Bot postet Updates zum Corona Virus im [Corona Deutschland Kanal](t.me/CoronaStats_DE), außerdem kannst du Ihn in jedem Chat als Inline Bot nutzen.\nKlicke einfach auf den Knopf unten, wähle einen Chat und klick auf das Feld."
 
     let replyMarkup = bot.inlineKeyboard([
         [
@@ -385,5 +354,4 @@ bot.on(/^\/start$/i, (msg) => {
     ]);
 
     msg.reply.text(MSG, {parseMode: 'markdown', replyMarkup});
-
 });
