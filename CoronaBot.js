@@ -44,11 +44,11 @@ let getCorona = function getCorona() {
                     }
                 }
                 var KillMSG = "Nothing";
-				/*
+                /*
                 if(deaths - LTarr[2] >= 2){var KillMSG = "Double Kill"}
                 if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
                 if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
-				*/
+                */
 
             var Output = {
                 confirmed: confirmed,
@@ -298,19 +298,28 @@ setInterval(function(){
                 if(StartTime - Corona.Zeit <= 600000){
                     log("Kanalpost übersprungen, da die Zeit zu gering war.")
                 }else{
+
+                var date = new Date(Date.now());
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var day = date.getDate() - 1;
+                var hours = date.getHours();
+                var minutes = "0" + date.getMinutes();
+
+                var formattedTime = day + "." + month + "." + year
     
                     if(Corona.KillMSG === "Nothing"){
                     
-                        var MessageOut = "Corona Deutschland **HEUTE**\n--- 24h ---:\n- Bestätigt: " + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")\n";
+                        var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n#TäglicherReport " + formattedTime;
                     }else{
-                        var MessageOut = "Corona Deutschland **HEUTE**\n--- 24h ---:\n- Bestätigt: " + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")\n\n-- " + Corona.KillMSG + " --";
+                        var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n-- " + Corona.KillMSG + " --\n\n#TäglicherReport " + formattedTime;
                     }
     
-                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'markdown' });
+                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' }); //-1001466291563
     
-                    fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
+                    /*fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         log("last24.csv was written...")
-                    });
+                    });*/
                 }
             }
         }).catch(error => console.log('getCorona24 Error:', error));
@@ -328,19 +337,19 @@ setInterval(function(){
                 var year = date.getFullYear()
                 var month = date.getMonth() + 1
                 var day = date.getDate()
-                var hours = date.getHours();
+                var hours = date.getHours() ;
                 var minutes = "0" + date.getMinutes();
 
                 var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
 
                 if(Corona.KillMSG === "Nothing")
                 {
-                    var MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")\n\nStand: ***" + formattedTime + "***";
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                 }else{
-                    var MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")\n\n-- " + Corona.KillMSG + " --\n\nStand: ***" + formattedTime + "***";
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\n-- <b>' + Corona.KillMSG + ' --\n\nStand: ' + formattedTime + '</b>';
                 }
 
-                bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'markdown' });
+                bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' }); //-1001466291563 206921999
 
                 fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                     log("last.csv was written...")
