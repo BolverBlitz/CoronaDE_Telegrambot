@@ -49,7 +49,8 @@ let getCorona = function getCorona() {
                 if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
                 if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
                 */
-
+               
+                log(confirmed)
             var Output = {
                 confirmed: confirmed,
                 confirmeddiff: confirmed - LTarr[0],
@@ -340,32 +341,34 @@ setInterval(function(){
 
                 if(Corona.ZeitStempel * 1000 <= Corona.ZeitStempel * 1000){
 
-                var date = new Date(Corona.ZeitStempel * 1000)
-                var year = date.getFullYear()
-                var month = date.getMonth() + 1
-                var day = date.getDate()
-                var hours = date.getHours() ;
-                var minutes = "0" + date.getMinutes();
+                    var date = new Date(Corona.ZeitStempel * 1000)
+                    var year = date.getFullYear()
+                    var month = date.getMonth() + 1
+                    var day = date.getDate()
+                    var hours = date.getHours() ;
+                    var minutes = "0" + date.getMinutes();
 
-                var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
+                    var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
 
-                if(Corona.KillMSG === "Nothing")
-                {
-                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    if(Corona.KillMSG === "Nothing")
+                    {
+                        var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    }else{
+                        var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\n-- <b>' + Corona.KillMSG + ' --\n\nStand: ' + formattedTime + '</b>';
+                    }
+
+                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
+
+                    fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
+                        log("last.csv was written...")
+                    });
+
                 }else{
-                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\n-- <b>' + Corona.KillMSG + ' --\n\nStand: ' + formattedTime + '</b>';
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    log(MessageOut)
+                    log("Timestamp in file war älter als Timestap der letzten änderung")
+                    console.log(Corona.ZeitStempel, Corona.ZeitSpempel)
                 }
-
-                bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
-
-                fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
-                    log("last.csv was written...")
-                });
-
-            }else{
-                log("Timestamp in file war älter als Timestap der letzten änderung")
-                console.log(Corona.ZeitStempel, Corona.ZeitSpempel)
-            }
           }
      }
     }).catch(error => console.log('getCorona Error:', error));
