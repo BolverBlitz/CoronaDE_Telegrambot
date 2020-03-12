@@ -161,7 +161,7 @@ bot.on('inlineQuery', msg => {
             ]
         ]);
 
-        var date = new Date(Corona.ZeitSpempel * 1000)
+        var date = new Date(Corona.ZeitStempel * 1000)
         var year = date.getFullYear()
         var month = date.getMonth() + 1
         var day = date.getDate()
