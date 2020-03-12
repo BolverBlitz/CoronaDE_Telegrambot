@@ -59,7 +59,8 @@ let getCorona = function getCorona() {
                 deathsdiff: deaths - LTarr[2],
                 KillMSG: KillMSG,
                 Zeit: LTarr[3], //Alter Wert des letzten Posts aus File
-                ZeitSpempel: StandZeit/1000 //Neuer höchster Wert der aktuellen anfrage
+                ZeitStempelAlt: LTarr[4]/1000,
+                ZeitStempel: StandZeit/1000 //Neuer höchster Wert der aktuellen anfrage
                 };
                 fs.writeFile("current.csv", confirmed + "," + recovered + "," + deaths + "," + new Date().getTime() + "," + StandZeit, (err) => {if (err) console.log(err);
                     log("current.csv was written...")
@@ -108,7 +109,7 @@ let getCorona24 = function getCorona24() {
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
                 KillMSG: KillMSG,
-                Ziet: LTarr[3]
+                Zeit: LTarr[3]
                 };
                 resolve(Output);
         })
@@ -125,8 +126,8 @@ let getCoronaFromFile = function getCoronaFromFile() {
             confirmed: LTarr[0],
             recovered: LTarr[1],
             deaths: LTarr[2],
-            Ziet: LTarr[3],
-            ZeitSpempel: LTarr[4]/1000
+            Zeit: LTarr[3],
+            ZeitStempel: LTarr[4]/1000
             };
         resolve(Output);
     });
@@ -336,9 +337,10 @@ setInterval(function(){
             if(StartTime - Corona.Zeit <= 600000){
                 log("Kanalpost übersprungen, da die Zeit zu gering war.")
             }else{
-                if(Corona.Zeit >= Corona.ZeitSpempel * 1000){
 
-                var date = new Date(Corona.ZeitSpempel * 1000)
+                if(Corona.ZeitStempel * 1000 <= Corona.ZeitStempel * 1000){
+
+                var date = new Date(Corona.ZeitStempel * 1000)
                 var year = date.getFullYear()
                 var month = date.getMonth() + 1
                 var day = date.getDate()
@@ -356,12 +358,13 @@ setInterval(function(){
 
                 bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 
-                fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + Corona.ZeitSpempel * 1000, (err) => {if (err) console.log(err);
+                fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
                     log("last.csv was written...")
                 });
+
             }else{
                 log("Timestamp in file war älter als Timestap der letzten änderung")
-                console.log(Corona.Zeit, Corona.ZeitSpempel * 1000)
+                console.log(Corona.ZeitStempel, Corona.ZeitSpempel)
             }
           }
      }
