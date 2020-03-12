@@ -134,10 +134,10 @@ let getCoronaFromFile = function getCoronaFromFile() {
     });
 }
 
-let getCoronaDeteil = function getCoronaDeteil() {
+let getCoronaDetail = function getCoronaDetail() {
     return new Promise(function(resolve, reject) {
         var Output = [];
-        log("Pushed: getCoronaDeteil");
+        log("Pushed: getCoronaDetail");
         request(url, (err, res, body) => {
                 var bodyarr = body.split(',')
                 //console.log(bodyarr.length)
@@ -217,7 +217,7 @@ bot.on('callbackQuery', (msg) => {
             showAlert: false
         });
         let MSG = "Corona Deutschland:\n";
-        getCoronaDeteil().then(function(Corona) {
+        getCoronaDetail().then(function(Corona) {
 
             Corona.map((Corona) =>{
                 MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
@@ -385,5 +385,4 @@ bot.on(/^\/start$/i, (msg) => {
     ]);
 
     msg.reply.text(MSG, {parseMode: 'markdown', replyMarkup});
-
 });
