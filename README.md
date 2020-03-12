@@ -6,7 +6,7 @@ t.me/CoronaStats_DE
 
 `npm i telebot`
 
-Enter Telegram Bottoken in secret.json you also may wannt to chance Kanal ID in the code.
+Enter Telegram Bot Token in secret.json you also may want to chance Kanal ID in the code.
 
 `node Coronabot.js`
 
