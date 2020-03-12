@@ -58,8 +58,8 @@ let getCorona = function getCorona() {
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
                 KillMSG: KillMSG,
-                Ziet: LTarr[3],
-                ZeitSpempel: StandZeit/1000
+                Zeit: LTarr[3], //Alter Wert des letzten Posts aus File
+                ZeitSpempel: StandZeit/1000 //Neuer höchster Wert der aktuellen anfrage
                 };
                 fs.writeFile("current.csv", confirmed + "," + recovered + "," + deaths + "," + new Date().getTime() + "," + StandZeit, (err) => {if (err) console.log(err);
                     log("current.csv was written...")
@@ -94,9 +94,11 @@ let getCorona24 = function getCorona24() {
                     }
                 }
                 var KillMSG = "Nothing";
+                /*
                 if(deaths - LTarr[2] >= 2){var KillMSG = "Double Kill"}
                 if(deaths - LTarr[2] >= 3){var KillMSG = "Tripple Kill"}
                 if(deaths - LTarr[2] >= 4){var KillMSG = "M-M-M-MONSTERKILL"}
+                */
 
             var Output = {
                 confirmed: confirmed,
@@ -182,7 +184,7 @@ bot.on('inlineQuery', msg => {
         var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
 
 
-        let MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***\n[Corona Deutschland Status](t.me/CoronaStats_DE)";
+        let MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
 
         answers.addArticle({
             id: 1,
@@ -216,21 +218,21 @@ bot.on('callbackQuery', (msg) => {
         getCoronaDeteil().then(function(Corona) {
 
             Corona.map((Corona) =>{
-                MSG = MSG + Corona.Bundesland + ": " + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️ \n"
+                MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
             });
 
             
-            MSG = MSG + "\n\n [Corona Deutschland Status](t.me/CoronaStats_DE)"
+            MSG = MSG + "[Corona Deutschland Status](t.me/CoronaStats_DE)"
 
             if ('inline_message_id' in msg) {
                 bot.editMessageText(
                     {inlineMsgId: inlineId}, MSG,
-                    {parseMode: 'markdown'}
+                    {parseMode: 'markdown', webPreview: false}
                 ).catch(error => console.log('Error:', error));
             }else{
                 bot.editMessageText(
                     {chatId: chatId, messageId: messageId}, MSG,
-                    {parseMode: 'markdown'}
+                    {parseMode: 'markdown', webPreview: false}
                 ).catch(error => console.log('Error:', error));
             }
 
@@ -238,9 +240,11 @@ bot.on('callbackQuery', (msg) => {
     }
 });
 
+/*----------------------Custom Log Funktion--------------------------*/
 function log(info) {
 	console.log("[" + getDateTime(new Date()) + "]" + " " + info)
 }
+
 /*----------------------Time--------------------------*/
 function getDateTime(date) {
 
@@ -315,7 +319,7 @@ setInterval(function(){
                         var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n-- " + Corona.KillMSG + " --\n\n#TäglicherReport " + formattedTime;
                     }
     
-                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' }); //-1001466291563
+                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563
     
                     /*fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         log("last24.csv was written...")
@@ -332,6 +336,7 @@ setInterval(function(){
             if(StartTime - Corona.Zeit <= 600000){
                 log("Kanalpost übersprungen, da die Zeit zu gering war.")
             }else{
+                if(Corona.Zeit >= Corona.ZeitSpempel * 1000){
 
                 var date = new Date(Corona.ZeitSpempel * 1000)
                 var year = date.getFullYear()
@@ -349,11 +354,15 @@ setInterval(function(){
                     var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\n-- <b>' + Corona.KillMSG + ' --\n\nStand: ' + formattedTime + '</b>';
                 }
 
-                bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' }); //-1001466291563 206921999
+                bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 
-                fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
+                fs.writeFile("last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + Corona.ZeitSpempel * 1000, (err) => {if (err) console.log(err);
                     log("last.csv was written...")
                 });
+            }else{
+                log("Timestamp in file war älter als Timestap der letzten änderung")
+                console.log(Corona.Zeit, Corona.ZeitSpempel * 1000)
+            }
           }
      }
     }).catch(error => console.log('getCorona Error:', error));
