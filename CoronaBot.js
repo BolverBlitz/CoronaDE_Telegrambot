@@ -10,7 +10,7 @@ const bot = new Telebot({
         usePlugins: ['commandButton']
 });
 
-var url = 'https://interaktiv.morgenpost.de/corona-virus-karte-infektionen-deutschland-weltweit/data/Coronavirus.current.csv'
+var url = 'https://interaktiv.morgenpost.de/corona-virus-karte-infektionen-deutschland-weltweit/data/Coronavirus.current.v2.csv'
 
 
 bot.start(); //Telegram bot start
@@ -37,9 +37,9 @@ let getCorona = function getCorona() {
                             if(bodyarr[i+2] >= StandZeit){
                                 StandZeit = bodyarr[i+2]
                             }
-                            confirmed = confirmed + parseInt(bodyarr[i+5])
-                            recovered = recovered + parseInt(bodyarr[i+6])
-                            deaths = deaths + parseInt(bodyarr[i+7])
+                            confirmed = confirmed + parseInt(bodyarr[i+4])
+                            recovered = recovered + parseInt(bodyarr[i+5])
+                            deaths = deaths + parseInt(bodyarr[i+6])
                         }
                     }
                 }
@@ -72,22 +72,52 @@ let getCorona24 = function getCorona24() {
             let confirmed = 0;
             let recovered = 0;
             let deaths = 0;
+            let Bundesländer = [];
+            let BundesländerAlt = [];
                 var LT = fs.readFileSync('./last24.csv');
                 var LTarr = LT.toString().split(/\s+/);
                 var LTarr = LTarr.toString().split(",");
+
+                var BT = fs.readFileSync('./Bundesländer24.csv');
+                var BTarr = BT.toString().split("\n");
+
+                for(var i = 0; i < BTarr.length-1;i++){
+                    var BTarrFor = BTarr[i].toString().split(".");
+                    let temp = {
+                        Bundesland: BTarrFor[0],
+                        confirmed: Number(BTarrFor[1]),
+                        recovered: Number(BTarrFor[2]),
+                        deaths: Number(BTarrFor[3])
+                    }
+                    BundesländerAlt.push(temp);
+                };
+
                 if (err) { reject(err) }
                 
                 var bodyarr = body.split(',')
-                //console.log(bodyarr.length)
+                var tracker = 0;
                 for(var i = 0; i < bodyarr.length;i++){
                     if(bodyarr[i].indexOf("Deutschland") >= 0){
                         if(bodyarr[i+1] !== "Repatriierte"){
-                            confirmed = confirmed + parseInt(bodyarr[i+5])
-                            recovered = recovered + parseInt(bodyarr[i+6])
-                            deaths = deaths + parseInt(bodyarr[i+7])
+                            confirmed = confirmed + parseInt(bodyarr[i+4])
+                            recovered = recovered + parseInt(bodyarr[i+5])
+                            deaths = deaths + parseInt(bodyarr[i+6])
+                            let temp = {
+                                Bundesland: bodyarr[i+1],
+                                confirmed: Number(bodyarr[i+4]),
+                                confirmeddiff: Number(bodyarr[i+4]) - BundesländerAlt[tracker].confirmed,
+                                recovered: Number(bodyarr[i+5]),
+                                recovereddiff: Number(bodyarr[i+5]) - BundesländerAlt[tracker].recovered,
+                                deaths: Number(bodyarr[i+6]),
+                                deathsdiff: Number(bodyarr[i+6]) - BundesländerAlt[tracker].deaths
+                            }
+                            Bundesländer.push(temp);
+                            tracker++;
                         }
                     }
                 }
+
+                Bundesländer.sort((a, b) => (a.confirmed > b.confirmed) ? -1 : 1)
 
             var Output = {
                 confirmed: confirmed,
@@ -96,7 +126,8 @@ let getCorona24 = function getCorona24() {
                 recovereddiff: recovered - LTarr[1],
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
-                Zeit: LTarr[3]
+                Zeit: LTarr[3],
+                Bundesländer: Bundesländer
                 };
                 resolve(Output);
         })
@@ -133,9 +164,9 @@ let getCoronaDetail = function getCoronaDetail() {
                             //Output = Output + bodyarr[i+1] + "," + bodyarr[i+5] + "," + bodyarr[i+6] + "," + bodyarr[i+7] + ",";
                             let temp = {
                                 Bundesland: bodyarr[i+1],
-                                confirmed: Number(bodyarr[i+5]),
-                                recovered: Number(bodyarr[i+6]),
-                                deaths: Number(bodyarr[i+7])
+                                confirmed: Number(bodyarr[i+4]),
+                                recovered: Number(bodyarr[i+5]),
+                                deaths: Number(bodyarr[i+6])
                             }
                             Output.push(temp);
                         }
@@ -182,7 +213,7 @@ bot.on('inlineQuery', msg => {
         })
         return bot.answerQuery(answers);
 
-    }).catch(error => console.log('getCorona Error:', error));
+    }).catch(error => console.log('inlineQuery Error:', error));
 });
 
 /*----------------------Callback for Buttons--------------------------*/
@@ -284,9 +315,6 @@ setInterval(function(){
             let StartTime = new Date().getTime();
             let changed = parseInt(Corona.confirmeddiff) + parseInt(Corona.recovereddiff) + parseInt(Corona.deathsdiff)
             if(changed >= 1){
-                if(StartTime - Corona.Zeit <= 600000){
-                    log("Kanalpost übersprungen, da die Zeit zu gering war.")
-                }else{
 
                 var date = new Date(Date.now());
                 var year = date.getFullYear();
@@ -295,14 +323,27 @@ setInterval(function(){
                 var hours = date.getHours();
                 var minutes = "0" + date.getMinutes();
 
+                var MSGBundesländer = "";
+                var WriteFile = "";
+                    Corona.Bundesländer.map((Bundesländer) =>{
+                        WriteFile = WriteFile + Bundesländer.Bundesland + "." + Bundesländer.confirmed + "." + Bundesländer.recovered + "." + Bundesländer.deaths + "\n";
+                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + Bundesländer.confirmed + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + Bundesländer.recovered + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + Bundesländer.deaths + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
+                    });
+
                 var formattedTime = day + "." + month + "." + year
-                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - 24 Stunden - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n#TäglicherReport " + formattedTime;
+
+                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
+                    
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563
-    
-                    /*fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
+                    
+                    fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         log("last24.csv was written...")
-                    });*/
-                }
+                    });
+
+                    fs.writeFile("Bundesländer24.csv", WriteFile, (err) => {if (err) console.log(err);
+                        log("Bundesländer24.csv was written...")
+                    });
+                    
             }
         }).catch(error => console.log('getCorona24 Error:', error));
 	}
