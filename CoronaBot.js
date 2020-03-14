@@ -117,19 +117,28 @@ let getCorona24 = function getCorona24() {
                     }
                 }
 
-                Bundesländer.sort((a, b) => (a.confirmed > b.confirmed) ? -1 : 1)
+                var WriteFile = "";
+                Bundesländer.map((Bundesländer) =>{
+                    WriteFile = WriteFile + Bundesländer.Bundesland + "." + Bundesländer.confirmed + "." + Bundesländer.recovered + "." + Bundesländer.deaths + "\n";
+                });
 
-            var Output = {
-                confirmed: confirmed,
-                confirmeddiff: confirmed - LTarr[0],
-                recovered: recovered,
-                recovereddiff: recovered - LTarr[1],
-                deaths: deaths,
-                deathsdiff: deaths - LTarr[2],
-                Zeit: LTarr[3],
-                Bundesländer: Bundesländer
-                };
-                resolve(Output);
+                fs.writeFile("Bundesländer24.csv", WriteFile, (err) => {if (err) console.log(err);
+                    log("Bundesländer24.csv was written...")
+                    Bundesländer.sort((a, b) => (a.confirmed > b.confirmed) ? -1 : 1)
+
+                    var Output = {
+                        confirmed: confirmed,
+                        confirmeddiff: confirmed - LTarr[0],
+                        recovered: recovered,
+                        recovereddiff: recovered - LTarr[1],
+                        deaths: deaths,
+                        deathsdiff: deaths - LTarr[2],
+                        Zeit: LTarr[3],
+                        Bundesländer: Bundesländer
+                        };
+
+                    resolve(Output);
+                });
         })
     })
 }
@@ -253,7 +262,7 @@ bot.on('callbackQuery', (msg) => {
                 ).catch(error => console.log('Error:', error));
             }
 
-        });
+        }).catch(error => console.log('Knopf Error:', error));
     }
 });
 
@@ -310,7 +319,7 @@ function getHourDE(date) {
 /*----------------------Trigger--------------------------*/
 setInterval(function(){
 
-    if(getHourDE(new Date()) === '0000'){
+    if(getHourDE(new Date()) === '0045'){
 		getCorona24().then(function(Corona) {
             let StartTime = new Date().getTime();
             let changed = parseInt(Corona.confirmeddiff) + parseInt(Corona.recovereddiff) + parseInt(Corona.deathsdiff)
@@ -324,9 +333,7 @@ setInterval(function(){
                 var minutes = "0" + date.getMinutes();
 
                 var MSGBundesländer = "";
-                var WriteFile = "";
                     Corona.Bundesländer.map((Bundesländer) =>{
-                        WriteFile = WriteFile + Bundesländer.Bundesland + "." + Bundesländer.confirmed + "." + Bundesländer.recovered + "." + Bundesländer.deaths + "\n";
                         MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + Bundesländer.confirmed + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + Bundesländer.recovered + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + Bundesländer.deaths + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
                     });
 
@@ -334,14 +341,10 @@ setInterval(function(){
 
                     var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
-                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563
+                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
                     
                     fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         log("last24.csv was written...")
-                    });
-
-                    fs.writeFile("Bundesländer24.csv", WriteFile, (err) => {if (err) console.log(err);
-                        log("Bundesländer24.csv was written...")
                     });
                     
             }
