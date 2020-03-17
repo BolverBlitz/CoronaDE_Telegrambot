@@ -142,6 +142,7 @@ let getCorona24 = function getCorona24() {
         })
     })
 }
+//getCorona24().then(function(Corona) {});
 
 let getCoronaFromFile = function getCoronaFromFile() {
     return new Promise(function(resolve, reject) {
@@ -191,11 +192,11 @@ let getCoronaDetail = function getCoronaDetail() {
 bot.on('inlineQuery', msg => {
 
     let query = msg.query;
-    const answers = bot.answerList(msg.id, {cacheTime: 1});
+    const answers = bot.answerList(msg.id, {cacheTime: 60});
     
 	getCoronaFromFile().then(function(Corona) {
 
-        let replyMarkup = bot.inlineKeyboard([ //If TG ID is set, chance to remove TelegramID
+        let replyMarkup = bot.inlineKeyboard([
             [
                 bot.inlineButton('Mehr Details', {callback: 'Details'})
             ]
@@ -240,6 +241,13 @@ bot.on('callbackQuery', (msg) => {
             text: "Lade Details...",
             showAlert: false
         });
+
+        let replyMarkup = bot.inlineKeyboard([
+            [
+                bot.inlineButton('Zurück', {callback: 'NoDetails'})
+            ]
+        ]);
+
         let MSG = "Corona Deutschland:\n";
         getCoronaDetail().then(function(Corona) {
 
@@ -253,17 +261,61 @@ bot.on('callbackQuery', (msg) => {
             if ('inline_message_id' in msg) {
                 bot.editMessageText(
                     {inlineMsgId: inlineId}, MSG,
-                    {parseMode: 'markdown', webPreview: false}
+                    {parseMode: 'markdown', webPreview: false, replyMarkup}
                 ).catch(error => console.log('Error:', error));
             }else{
                 bot.editMessageText(
                     {chatId: chatId, messageId: messageId}, MSG,
-                    {parseMode: 'markdown', webPreview: false}
+                    {parseMode: 'markdown', webPreview: false, replyMarkup}
                 ).catch(error => console.log('Error:', error));
             }
 
         }).catch(error => console.log('Knopf Error:', error));
     }
+
+    if(msg.data === 'NoDetails'){
+        bot.answerCallbackQuery(msg.id,{
+            text: "Lade weniger Details...",
+            showAlert: false
+        });
+
+        let replyMarkup = bot.inlineKeyboard([
+            [
+                bot.inlineButton('Mehr Details', {callback: 'Details'})
+            ]
+        ]);
+
+        let MSG = "Corona Deutschland:\n";
+
+        getCoronaFromFile().then(function(Corona) {
+    
+            var date = new Date(Corona.ZeitStempel * 1000)
+            var year = date.getFullYear()
+            var month = date.getMonth() + 1
+            var day = date.getDate()
+            var hours = date.getHours();
+            var minutes = "0" + date.getMinutes();
+    
+            var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
+    
+    
+            let MSG = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
+
+            if ('inline_message_id' in msg) {
+                bot.editMessageText(
+                    {inlineMsgId: inlineId}, MSG,
+                    {parseMode: 'markdown', webPreview: false, replyMarkup}
+                ).catch(error => console.log('Error:', error));
+            }else{
+                bot.editMessageText(
+                    {chatId: chatId, messageId: messageId}, MSG,
+                    {parseMode: 'markdown', webPreview: false, replyMarkup}
+                ).catch(error => console.log('Error:', error));
+            }
+
+        }).catch(error => console.log('Knopf Error:', error));
+    }
+
 });
 
 /*----------------------Custom Log Funktion--------------------------*/
@@ -319,7 +371,7 @@ function getHourDE(date) {
 /*----------------------Trigger--------------------------*/
 setInterval(function(){
 
-    if(getHourDE(new Date()) === '0045'){
+    if(getHourDE(new Date()) === '0000'){
 		getCorona24().then(function(Corona) {
             let StartTime = new Date().getTime();
             let changed = parseInt(Corona.confirmeddiff) + parseInt(Corona.recovereddiff) + parseInt(Corona.deathsdiff)
