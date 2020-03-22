@@ -1,0 +1,11 @@
+{
+	"botname":"CoronaBot",
+	"LogChat":"-1001211106939",
+	"isSuperAdmin":"206921999",
+	"isSuperAdminUsername":"BolverBlitz",
+	"dbreaduserhost":"example.com",
+	"dbreaduser":"root",
+	"database":"CoronaBot",
+	"WTdelmsgshort":"5400",
+	"WTdelmsglong":"15400"
+}
