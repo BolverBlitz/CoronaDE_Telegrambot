@@ -27,7 +27,7 @@ let getCorona = function getCorona() {
                 var LTarr = LT.toString().split(/\s+/);
                 var LTarr = LTarr.toString().split(",");
                 if (err) { reject(err) }
-                
+                if(bodyarr === "undefined"){reject("request Failed")};
                 var bodyarr = body.split(',')
                 //console.log(bodyarr.length)
                 var StandZeit = 0;
@@ -394,6 +394,7 @@ setInterval(function(){
                     var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
+					bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
                     
                     fs.writeFile("last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         log("last24.csv was written...")
@@ -441,7 +442,7 @@ setInterval(function(){
 
 /*----------------------Start--------------------------*/
 bot.on(/^\/start$/i, (msg) => {
-    let MSG = "Dieser Bot postet Updates zum Corona Virus im [Corona Deutschland Kanal](t.me/CoronaStats_DE), außerdem kannst du Ihn in jedem Chat als Inline Bot nutzen.\nKlicke einfach auf den Knopf unten, wähle einen Chat und klick auf das Feld."
+    let MSG = "Dieser Bot postet Updates zum Corona Virus im [Corona Deutschland Kanal](t.me/CoronaStats_DE), außerdem kannst du Ihn in jedem Chat als Inline Bot nutzen.\nKlicke einfach auf den Knopf unten, wähle einen Chat und klick auf das Feld.\n\nMit /faq kannst du das Bot FAQ anzeigen.\nMit /ask kannst du eine Frage stellen die mit ins FAQ soll\nAlle weiteren Fragen bitt im [Corona DACH Chat](https://t.me/joinchat/AKrnBlRo1GoUgRoatj6LUA)"
 
     let replyMarkup = bot.inlineKeyboard([
         [
@@ -450,4 +451,32 @@ bot.on(/^\/start$/i, (msg) => {
     ]);
 
     msg.reply.text(MSG, {parseMode: 'markdown', replyMarkup});
+});
+
+bot.on(/^\/faq$/i, (msg) => {
+    bot.deleteMessage(msg.chat.id, msg.message_id);
+
+    let MSG = "<u>Woher kommen die Daten:</u>\nRKI (Robert Koch Institut)"
+    MSG += "\n\n<u>Wie oft werden die Daten bezogen:</u>\nDaten werden jede Minute von einem internen Link bezogen und für 60 Sekunden gespeichert um die Webseite zu entlasten"
+    MSG += "\n\n<u>Warum sind die Standzeiten oft identisch?</u>\nDass weiß ich nicht genau, durch Beobachtungen kann ich folgendes sagen. Jedes Bundesland aktualisiert seine Zahlen einzeln und die Zeiten werden gerundet auf die volle Stunde. Warum es teils jedoch 2h hinterher ist, weiß ich nicht. Ich zeige immer den aktuellsten Zeitstempel an, auch wenn andere Bundesländer noch nicht geupdatet haben."
+    MSG += "\n\n<u>Was soll ich machen, wenn eine oder mehrere Zahlen NaN, extrem große oder negative werte zeigen?</u>\nBitte @BolverBlitz kontaktieren. Da die Daten aus einer Datei kommen muss der bot den groben Aufbau kennen um die Wette richtig zuordnen zu können, bisher wurde diese Datei 2 Mal geändert."
+    MSG += "\n\n<u>Inline und Inline Knöpfe funktionieren nicht, was tun?</u>\nLeider ist das ein Bug den ich bisher weder finden noch reproduzieren konnte. Der Bot startet daher aktuell jede halbe Stunde neu, sollte es danach noch immer nicht gehen bitte @BolverBlitz kontaktieren. Die Kanalupdates funktionieren weiterhin."
+
+    msg.reply.text(MSG, {parseMode: 'html'});
+});
+
+bot.on(/^\/ask$/i, (msg) => {
+    msg.reply.text("Leider konnte ich deine Frage nicht finden.\n\nBitte mach: /ask Hier deine Frage!")
+});
+
+bot.on(/^\/ask(.+)$/i, (msg, props) => {
+	const Para = props.match[1].split(' ');
+    var MSG = Para[1];
+    for(var i = 2; i < Para.length;i++){
+        MSG = MSG + " " + Para[i];
+    }
+
+	bot.deleteMessage(msg.chat.id, msg.message_id);
+	msg.reply.text("Deine Frage wurde gesendet!\n" + MSG)
+	bot.sendMessage(config.LogChat, " Neue Frage: \n" + MSG);
 });
