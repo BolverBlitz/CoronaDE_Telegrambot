@@ -13,10 +13,13 @@ var db = mysql.createPool({
 });
 //MySQL Syntax
 let sqlcmd = "CREATE DATABASE IF NOT EXISTS " + config.database + ";";
-let sqlcmdtable = "CREATE TABLE IF NOT EXISTS `Bundesländer` (`TimeStamp` DOUBLE NOT NULL,`Baden-Württemberg` varchar(255), `Bayern` varchar(255), `Berlin` varchar(255), `Brandenburg` varchar(255), `Bremen` varchar(255), `Hamburg` varchar(255), `Hessen` varchar(255), `Mecklenburg-Vorpommern` varchar(255), `Niedersachsen` varchar(255), `Nordrhein-Westfalen` varchar(255), `Rheinland-Pfalz` varchar(255), `Saarland` varchar(255), `Sachsen` varchar(255), `Sachsen-Anhalt` varchar(255), `Schleswig-Holstein` varchar(255), `Thüringen` varchar(255), `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`TimeStamp`));";
+//let sqlcmdtable = "CREATE TABLE IF NOT EXISTS `Bundesländer` (`TimeStamp` DOUBLE NOT NULL,`Baden-Württemberg` varchar(255), `Bayern` varchar(255), `Berlin` varchar(255), `Brandenburg` varchar(255), `Bremen` varchar(255), `Hamburg` varchar(255), `Hessen` varchar(255), `Mecklenburg-Vorpommern` varchar(255), `Niedersachsen` varchar(255), `Nordrhein-Westfalen` varchar(255), `Rheinland-Pfalz` varchar(255), `Saarland` varchar(255), `Sachsen` varchar(255), `Sachsen-Anhalt` varchar(255), `Schleswig-Holstein` varchar(255), `Thüringen` varchar(255), `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`TimeStamp`));";
+let sqlcmdtable = "CREATE TABLE IF NOT EXISTS `region` (`TimeStamp` varchar(255) ,`Bundesland` varchar(255), `Ort` varchar(255), `Quelle` varchar(255), `QuelleURL` varchar(255), `confirmed` varchar(255), `recovered` varchar(255), `deaths` varchar(255), `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`Ort`, `Bundesland`));"
+//let sqlcmdtable2 = "CREATE TABLE IF NOT EXISTS `Total` (`TimeStamp` DOUBLE NOT NULL,`TotalAll` varchar(255), `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`TimeStamp`))"
 
 //Create DB
 db.getConnection(function(err, connection){
+	if (err) throw err;
 	console.log("Connected to " + config.dbreaduserhost);
 	connection.query(sqlcmd, function(err, result){
                 if(err) throw err;
@@ -26,11 +29,12 @@ db.getConnection(function(err, connection){
 });
 //Create Table
 db.getConnection(function(err, connection){
+	if (err) throw err;
 	connection.query("USE " + config.database + ";", function(err, result){
 		console.log("DB switched " + config.database);
 		connection.query(sqlcmdtable, function(err, result){
-                if(err) throw err;
-				console.log("Table users created\n\nDone!");
+            if(err) throw err;
+			console.log("Table region created");
         });
     	connection.release();
 	});
