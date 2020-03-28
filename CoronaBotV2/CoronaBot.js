@@ -27,7 +27,6 @@ bot.start(); //Telegram bot start
 
 /*----------------------Inline Handler--------------------------*/
 bot.on('inlineQuery', msg => {
-
     let query = msg.query;
     let queryarr = query.split('');
     const answers = bot.answerList(msg.id, {cacheTime: 1});
@@ -70,7 +69,7 @@ bot.on('inlineQuery', msg => {
                 lookup: query,
                 collum: "Bundesland",
                 mode: "LIKE",
-                limit: 10
+                limit: 35
                 };
         }else{
         
@@ -115,7 +114,8 @@ bot.on('inlineQuery', msg => {
                         title: getCoronaDetail.Ort,
                         description: getCoronaDetail.Bundesland,
                         message_text: MessageOut,
-                        parse_mode: 'html'
+                        parse_mode: 'html',
+                        disable_web_page_preview: true
                     });
                     idcount++;
                 });
