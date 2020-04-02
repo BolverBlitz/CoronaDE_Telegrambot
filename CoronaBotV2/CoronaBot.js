@@ -360,6 +360,11 @@ setInterval(function(){
                     fs.writeFile("./data/last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
                         f.log("last.csv was written...")
                     });
+
+                    let LogLine = Corona.ZeitStempel + "," + Corona.confirmed + "," + Corona.confirmeddiff + "," + Corona.recovered + "," + Corona.recovereddiff + "," + Corona.deaths + "," + Corona.deathsdiff + "\n"
+                    fs.appendFile('./data/KanalLog.csv', LogLine, function (err) {
+                        if (err) {console.log('getCorona Error:', err)}
+                    })
           }
      }
     }).catch(error => console.log('getCorona Error:', error));

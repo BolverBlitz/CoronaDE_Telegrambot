@@ -1,4 +1,4 @@
-var url = ''
+var url = 'https://funkeinteraktiv.b-cdn.net/current.v3.csv'
 const request = require("request");
 const f = require("./funktions");
 var config = require("../config");
@@ -6,13 +6,14 @@ var secret = require("../secret");
 const util = require('util');
 var fs = require("fs");
 
+const BundesländerKürtzel = ['de.bw','de.by','de.be','de.bb','de.hb','de.he','de.mv','de.nd','de.nd','de.nw','de.rp','de.sl','de.sn','de.st','de.sh','de.th']
+const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen', 'nicht-zugeordnet']
 
 let getCorona = function getCorona() {
     return new Promise(function(resolve, reject) {
         var Output = "";
         f.log("Pushed: getCorona");
         request(url, (err, res, body) => {
-            let CountLänder = 0;
             let confirmed = 0;
             let recovered = 0;
             let deaths = 0;
@@ -24,17 +25,15 @@ let getCorona = function getCorona() {
                 var bodyarr = body.split(',')
                 var StandZeit = 0;
                 for(var i = 0; i < bodyarr.length;i++){
-                    if(bodyarr[i].indexOf("Deutschland") >= 0){
-                        if(CountLänder >= 16){
-                            bodyarr[i+1] = "Unbekannter Standort"
-                        }
-                            if(bodyarr[i+2] >= StandZeit){
-                                StandZeit = bodyarr[i+2]
+                    if(bodyarr[i].indexOf("de") >= 0){
+                        if(bodyarr[i+1] === "null"){
+                            if(bodyarr[i+2] === "Deutschland"){
+                                confirmed = parseInt(bodyarr[i+12])
+                                recovered = parseInt(bodyarr[i+13])
+                                deaths = parseInt(bodyarr[i+14])
+                                StandZeit = parseInt(bodyarr[i+10])
                             }
-                            confirmed = confirmed + parseInt(bodyarr[i+4])
-                            recovered = recovered + parseInt(bodyarr[i+5])
-                            deaths = deaths + parseInt(bodyarr[i+6])
-						CountLänder++;
+                        }
                     }
                 }
                
@@ -74,7 +73,6 @@ let getCorona24 = function getCorona24() {
 
                 var BT = fs.readFileSync('./data/Bundesländer24.csv');
                 var BTarr = BT.toString().split("\n");
-                console.log(BTarr)
                 for(var i = 0; i < BTarr.length-1;i++){
                     var BTarrFor = BTarr[i].toString().split(".");
                     let temp = {
@@ -85,54 +83,58 @@ let getCorona24 = function getCorona24() {
                     }
                     BundesländerAlt.push(temp);
                 };
-
+                //console.log(BundesländerAlt)
                 if (err) { reject(err) }
                 
-                var bodyarr = body.split(',')
+                var bodyarr = body.split('\n')
                 var tracker = 0;
-                for(var i = 0; i < bodyarr.length;i++){
-                    if(bodyarr[i].indexOf("Deutschland") >= 0){
-                        if(CountLänder >= 16){
-                            console.log(BundesländerAlt[tracker])
-                            confirmed = confirmed + parseInt(bodyarr[i+4])
-                            recovered = recovered + parseInt(bodyarr[i+5])
-                            deaths = deaths + parseInt(bodyarr[i+6])
-                            let temp = {
-                                Bundesland: "Unbekannter Standort",
-                                confirmed: Number(bodyarr[i+4]),
-                                confirmeddiff: Number(bodyarr[i+4]) - BundesländerAlt[tracker].confirmed,
-                                recovered: Number(bodyarr[i+5]),
-                                recovereddiff: Number(bodyarr[i+5]) - BundesländerAlt[tracker].recovered,
-                                deaths: Number(bodyarr[i+6]),
-                                deathsdiff: Number(bodyarr[i+6]) - BundesländerAlt[tracker].deaths
-                            }
-                            Bundesländer.push(temp);
-                        }else{
-                            confirmed = confirmed + parseInt(bodyarr[i+4])
-                            recovered = recovered + parseInt(bodyarr[i+5])
-                            deaths = deaths + parseInt(bodyarr[i+6])
-                            let temp = {
-                                Bundesland: bodyarr[i+1],
-                                confirmed: Number(bodyarr[i+4]),
-                                confirmeddiff: Number(bodyarr[i+4]) - BundesländerAlt[tracker].confirmed,
-                                recovered: Number(bodyarr[i+5]),
-                                recovereddiff: Number(bodyarr[i+5]) - BundesländerAlt[tracker].recovered,
-                                deaths: Number(bodyarr[i+6]),
-                                deathsdiff: Number(bodyarr[i+6]) - BundesländerAlt[tracker].deaths
-                            }
-                            Bundesländer.push(temp);
-                        }
+                bodyarr.map((Zeile) =>{
+                    var Zeilerr = Zeile.split(',')
+                    BundesländerKürtzel.map((BundesländerKürtzelMap) =>{
+                        if(Zeilerr[0].includes(BundesländerKürtzelMap)){
+                            if(Zeilerr[1] === "de"){
+                                if(CountLänder >= 16){
+                                    confirmed = confirmed + parseInt(bodyarr[i+4])
+                                    recovered = recovered + parseInt(bodyarr[i+5])
+                                    deaths = deaths + parseInt(bodyarr[i+6])
+                                    let temp = {
+                                        Bundesland: "Unbekannter Standort",
+                                        confirmed: Number(Zeilerr[13]),
+                                        confirmeddiff: Number(Zeilerr[13]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[14]),
+                                        recovereddiff: Number(Zeilerr[14]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[15]),
+                                        deathsdiff: Number(Zeilerr[15]) - BundesländerAlt[tracker].deaths
+                                    }
+                                    Bundesländer.push(temp);
+                                }else{
+                                    confirmed = confirmed + parseInt(Zeilerr[13])
+                                    recovered = recovered + parseInt(Zeilerr[14])
+                                    deaths = deaths + parseInt(Zeilerr[15])
+                                    let temp = {
+                                        Bundesland: Zeilerr[2],
+                                        confirmed: Number(Zeilerr[13]),
+                                        confirmeddiff: Number(Zeilerr[13]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[14]),
+                                        recovereddiff: Number(Zeilerr[14]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[15]),
+                                        deathsdiff: Number(Zeilerr[15]) - BundesländerAlt[tracker].deaths
+                                    }
+                                    Bundesländer.push(temp);
+                                }
 
-                            tracker++;
-                            CountLänder++;
-                    }
-                }
+                                    tracker++;
+                                    CountLänder++;
+                            }
+                        }
+                    });
+                });
 
                 var WriteFile = "";
                 Bundesländer.map((Bundesländer) =>{
                     WriteFile = WriteFile + Bundesländer.Bundesland + "." + Bundesländer.confirmed + "." + Bundesländer.recovered + "." + Bundesländer.deaths + "\n";
                 });
-
+            
                 fs.writeFile("./data/Bundesländer24.csv", WriteFile, (err) => {if (err) console.log(err);
                     f.log("Bundesländer24.csv was written...")
                     Bundesländer.sort((a, b) => (a.confirmed > b.confirmed) ? -1 : 1)
@@ -177,30 +179,34 @@ let getCoronaDetail = function getCoronaDetail(sort) {
         var Output = [];
         f.log("Pushed: getCoronaDetail");
         request(url, (err, res, body) => {
-                var bodyarr = body.split(',')
-                //console.log(bodyarr.length)
-                for(var i = 0; i < bodyarr.length;i++){
-                    if(bodyarr[i].indexOf("Deutschland") >= 0){
-                        if(CountLänder >= 16){
+            var bodyarr = body.split('\n')
+            bodyarr.map((Zeile) =>{
+                var Zeilerr = Zeile.split(',')
+                BundesländerKürtzel.map((BundesländerKürtzelMap) =>{
+                    if(Zeilerr[0].includes(BundesländerKürtzelMap)){
+                        if(Zeilerr[1] === "de"){
+                            if(CountLänder >= 16){
                                 var temp = {
                                     Bundesland: "Unbekannter Standort",
-                                    confirmed: Number(bodyarr[i+4]),
-                                    recovered: Number(bodyarr[i+5]),
-                                    deaths: Number(bodyarr[i+6])
+                                    confirmed: Number(Zeilerr[13]),
+                                    recovered: Number(Zeilerr[14]),
+                                    deaths: Number(Zeilerr[15])
                                 }
                                 Output.push(temp);
                             }else{
                                 let temp = {
-                                    Bundesland: bodyarr[i+1],
-                                    confirmed: Number(bodyarr[i+4]),
-                                    recovered: Number(bodyarr[i+5]),
-                                    deaths: Number(bodyarr[i+6])
+                                    Bundesland: Zeilerr[2],
+                                    confirmed: Number(Zeilerr[13]),
+                                    recovered: Number(Zeilerr[14]),
+                                    deaths: Number(Zeilerr[15])
                                 }
                                 Output.push(temp);
                             }
                             CountLänder++;
                         }
                     }
+                });
+            });
             if(sort === true){Output.sort((a, b) => (a.confirmed > b.confirmed) ? -1 : 1)}
             resolve(Output);
         })
