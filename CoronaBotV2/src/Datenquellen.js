@@ -94,9 +94,6 @@ let getCorona24 = function getCorona24() {
                         if(Zeilerr[0].includes(BundesländerKürtzelMap)){
                             if(Zeilerr[1] === "de"){
                                 if(CountLänder >= 16){
-                                    confirmed = confirmed + parseInt(bodyarr[i+4])
-                                    recovered = recovered + parseInt(bodyarr[i+5])
-                                    deaths = deaths + parseInt(bodyarr[i+6])
                                     let temp = {
                                         Bundesland: "Unbekannter Standort",
                                         confirmed: Number(Zeilerr[13]),
@@ -108,9 +105,6 @@ let getCorona24 = function getCorona24() {
                                     }
                                     Bundesländer.push(temp);
                                 }else{
-                                    confirmed = confirmed + parseInt(Zeilerr[13])
-                                    recovered = recovered + parseInt(Zeilerr[14])
-                                    deaths = deaths + parseInt(Zeilerr[15])
                                     let temp = {
                                         Bundesland: Zeilerr[2],
                                         confirmed: Number(Zeilerr[13]),
@@ -129,6 +123,19 @@ let getCorona24 = function getCorona24() {
                         }
                     });
                 });
+				var bodyarr = body.split(',')
+				for(var i = 0; i < bodyarr.length;i++){
+                    if(bodyarr[i].indexOf("de") >= 0){
+                        if(bodyarr[i+1] === "null"){
+                            if(bodyarr[i+2] === "Deutschland"){
+								//console.log(i)
+                                confirmed = parseInt(bodyarr[i+12])
+                                recovered = parseInt(bodyarr[i+13])
+                                deaths = parseInt(bodyarr[i+14])
+                            }
+                        }
+                    }
+                }
 
                 var WriteFile = "";
                 Bundesländer.map((Bundesländer) =>{
