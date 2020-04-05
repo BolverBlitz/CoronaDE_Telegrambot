@@ -18,6 +18,10 @@ SQL.updateDB().then(function(Output) {
     UpdateDBMin = 0
 });
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen']
 
 var url = 'https://interaktiv.morgenpost.de/corona-virus-karte-infektionen-deutschland-weltweit/data/Coronavirus.current.v2.csv'
@@ -49,7 +53,7 @@ bot.on('inlineQuery', msg => {
             var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
     
     
-            let MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
+            let MessageOut = "Corona Deutschland:\n- Bestätigt: " + numberWithCommas(Corona.confirmed) + " 🦠\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️\n\nStand: ***" + formattedTime + "***";
     
             answers.addArticle({
                 id: 1,
@@ -107,7 +111,7 @@ bot.on('inlineQuery', msg => {
             
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
                     }
-                    let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\n\n - Bestätigt: " + getCoronaDetail.confirmed + " 🦠\n - Wieder gesund: " + getCoronaDetail.recovered + " 💚\n - Todesfälle: " + getCoronaDetail.deaths + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
+                    let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
     
                     answers.addArticle({
                         id: idcount,
@@ -153,7 +157,7 @@ bot.on('callbackQuery', (msg) => {
         let MSG = "Corona Deutschland:\n";
         Datenquellen.getCoronaDetail(true).then(function(Corona) {
             Corona.map((Corona) =>{
-                MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
+                MSG = MSG + Corona.Bundesland + ":\n" + numberWithCommas(Corona.confirmed) + " 🦠| " + numberWithCommas(Corona.recovered) + " 💚| " + numberWithCommas(Corona.deaths) + " ⚰️\n\n";
             });
 
             
@@ -191,7 +195,7 @@ bot.on('callbackQuery', (msg) => {
         let MSG = "Corona Deutschland:\n";
         Datenquellen.getCoronaDetail(false).then(function(Corona) {
             Corona.map((Corona) =>{
-                MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
+                MSG = MSG + Corona.Bundesland + ":\n" + numberWithCommas(Corona.confirmed) + " 🦠| " + numberWithCommas(Corona.recovered) + " 💚| " + numberWithCommas(Corona.deaths) + " ⚰️\n\n";
             });
 
             
@@ -238,7 +242,7 @@ bot.on('callbackQuery', (msg) => {
             var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
     
     
-            let MSG = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
+            let MSG = "Corona Deutschland:\n- Bestätigt: " + numberWithCommas(Corona.confirmed) + " 🦠\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️\n\nStand: ***" + formattedTime + "***";
 
             if ('inline_message_id' in msg) {
                 bot.editMessageText(
@@ -319,12 +323,12 @@ setInterval(function(){
 
                 var MSGBundesländer = "";
                     Corona.Bundesländer.map((Bundesländer) =>{
-                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + Bundesländer.confirmed + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + Bundesländer.recovered + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + Bundesländer.deaths + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
+                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + numberWithCommas(Bundesländer.confirmed) + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + numberWithCommas(Bundesländer.recovered) + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + numberWithCommas(Bundesländer.deaths) + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
                     });
 
                 var formattedTime = day + "." + month + "." + year
 
-                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
+                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 					bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
@@ -354,7 +358,7 @@ setInterval(function(){
                     var minutes = "0" + date.getMinutes();
 
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + numberWithCommas(Corona.confirmed) + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + numberWithCommas(Corona.recovered) + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + numberWithCommas(Corona.deaths) + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 
                     fs.writeFile("./data/last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
