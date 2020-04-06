@@ -94,7 +94,7 @@ let updateDBRisklayer = function() {
 						var DateTimeTemp = DateTimeTemp.split(" ");
 						var DateTemp = DateTimeTemp[0].split("-");
 						var TimeTemp = DateTimeTemp[1].split(":");
-						var newDate = DateTemp[2] + "/" + DateTemp[1] + "/" + DateTemp[0];
+						var newDate = DateTemp[1] + "/" + DateTemp[2] + "/" + DateTemp[0];
 
 						if(tempBarr[12].includes('"')){
 							var TempUrl = tempBarr[14]
