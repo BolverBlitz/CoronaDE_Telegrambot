@@ -14,9 +14,18 @@ const bot = new Telebot({
 });
 
 SQL.updateDB().then(function(Output) {
-    f.log(Output.Text + " Es wurden " + Output.count + " eingelesen.")
+    f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Morgenpost")
     UpdateDBMin = 0
 });
+
+SQL.updateDBRisklayer().then(function(Output) {
+    f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
+    UpdateDBMin = 0
+});
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen']
 
@@ -29,100 +38,159 @@ bot.start(); //Telegram bot start
 bot.on('inlineQuery', msg => {
     let query = msg.query;
     let queryarr = query.split('');
+    queryBetaArr = query.split(' ');
     const answers = bot.answerList(msg.id, {cacheTime: 1});
-    if(queryarr.length === 0 || query === "corona"|| query === "Corona"){
-        Datenquellen.getCoronaFromFile().then(function(Corona) {
+    if(queryBetaArr[0] === "beta" || queryBetaArr[0] === "Beta"){
+        if(queryBetaArr[1] === undefined){queryBetaArr[1] = " "}; //Fix for .trim() error in SQL.js
+        
+        var para = {
+            lookup: queryBetaArr[1],
+            collum: "Ort",
+            mode: "LIKE",
+            table: "risklayer",
+            limit: 10
+            };
 
-            let replyMarkup = bot.inlineKeyboard([
-                [
-                    bot.inlineButton('Mehr Details', {callback: 'Details'})
-                ]
-            ]);
+    SQL.lookup(para).then(function(getCoronaDetail) {
+        let idcount = 0;
+                if(Object.entries(getCoronaDetail).length === 0){
+                    answers.addArticle({
+                        id: 'Not found',
+                        title: 'Leider habe ich keine Information über:',
+                        description: query,
+                        message_text: ("Leider habe ich keine Information über den angegebenen Ort " + query)
+                    });
+                    return bot.answerQuery(answers);
+                }else{
+                    getCoronaDetail.map((getCoronaDetail) => {
 
-            var date = new Date(Corona.ZeitStempel * 1000)
-            var year = date.getFullYear()
-            var month = date.getMonth() + 1
-            var day = date.getDate()
-            var hours = date.getHours();
-            var minutes = "0" + date.getMinutes();
-    
-            var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-    
-    
-            let MessageOut = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
-    
-            answers.addArticle({
-                id: 1,
-                title: "Corona Aktuell",
-                message_text: MessageOut,
-                reply_markup: replyMarkup,
-                parse_mode: 'markdown'
-            })
-            return bot.answerQuery(answers);
-    
-        }).catch(error => console.log('inlineQuery Error:', error));
+                        var date = new Date(getCoronaDetail.TimeStamp * 1000)
+                        var year = date.getFullYear()
+                        var month = date.getMonth() + 1
+                        var day = date.getDate()
+                        var hours = date.getHours();
+                        var minutes = "0" + date.getMinutes();
+                
+                        var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
+
+                        if(Object.entries(getCoronaDetail.QuelleURL).length === 0){
+                            var QuelleTemp = "Quelle nicht als Link verfügbar"
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: " + QuelleTemp + "\nStand: <b>" + formattedTime + "</b>";
+                        }else{
+                            var QuelleTemp = "Link"
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + QuelleTemp + "</a>\nStand: <b>" + formattedTime + "</b>";
+                        }
+        
+                        answers.addArticle({
+                            id: idcount,
+                            title: getCoronaDetail.Ort,
+                            //description: getCoronaDetail.Bundesland,
+                            message_text: MessageOut,
+                            parse_mode: 'html',
+                            disable_web_page_preview: true
+                        });
+                        idcount++;
+                    });
+                    return bot.answerQuery(answers);
+                }
+    }).catch(error => console.log('inlineQuery Error:', error));
 
     }else{
+        if(queryarr.length === 0 || query === "corona"|| query === "Corona"){
+            Datenquellen.getCoronaFromFile().then(function(Corona) {
 
-        if(BundesländerArray.includes(query)){
-            var para = {
-                lookup: query,
-                collum: "Bundesland",
-                mode: "LIKE",
-                limit: 35
-                };
-        }else{
+                let replyMarkup = bot.inlineKeyboard([
+                    [
+                        bot.inlineButton('Mehr Details', {callback: 'Details'})
+                    ]
+                ]);
+
+                var date = new Date(Corona.ZeitStempel * 1000)
+                var year = date.getFullYear()
+                var month = date.getMonth() + 1
+                var day = date.getDate()
+                var hours = date.getHours();
+                var minutes = "0" + date.getMinutes();
         
-            var para = {
-                lookup: query,
-                collum: "Ort",
-                mode: "LIKE",
-                limit: 10
-                };
-        }
-    
-        SQL.lookup(para).then(function(getCoronaDetail) {
-            let idcount = 0;
-            if(Object.entries(getCoronaDetail).length === 0){
+                var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
+        
+        
+                let MessageOut = "Corona Deutschland:\n- Bestätigt: " + numberWithCommas(Corona.confirmed) + " 🦠\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️\n\nStand: ***" + formattedTime + "***";
+        
                 answers.addArticle({
-                    id: 'Not found',
-                    title: 'Leider habe ich keine Information über:',
-                    description: query,
-                    message_text: ("Leider habe ich keine Information über den angegebenen Ort " + query)
-                });
+                    id: 1,
+                    title: "Corona Aktuell",
+                    message_text: MessageOut,
+                    reply_markup: replyMarkup,
+                    parse_mode: 'markdown'
+                })
                 return bot.answerQuery(answers);
-            }else{
-                getCoronaDetail.map((getCoronaDetail) => {
+        
+            }).catch(error => console.log('inlineQuery Error:', error));
 
-                    if(getCoronaDetail.TimeStamp === "123456789"){
-                        var formattedTime = "Unbekannt"
-                    }else{
-    
-                    var date = new Date(getCoronaDetail.TimeStamp * 1000)
-                    var year = date.getFullYear()
-                    var month = date.getMonth() + 1
-                    var day = date.getDate()
-                    var hours = date.getHours();
-                    var minutes = "0" + date.getMinutes();
+        }else{
+
+            if(BundesländerArray.includes(query)){
+                var para = {
+                    lookup: query,
+                    collum: "Bundesland",
+                    mode: "LIKE",
+                    limit: 35
+                    };
+            }else{
             
-                    var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-                    }
-                    let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\n\n - Bestätigt: " + getCoronaDetail.confirmed + " 🦠\n - Wieder gesund: " + getCoronaDetail.recovered + " 💚\n - Todesfälle: " + getCoronaDetail.deaths + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
-    
-                    answers.addArticle({
-                        id: idcount,
-                        title: getCoronaDetail.Ort,
-                        description: getCoronaDetail.Bundesland,
-                        message_text: MessageOut,
-                        parse_mode: 'html',
-                        disable_web_page_preview: true
-                    });
-                    idcount++;
-                });
-                return bot.answerQuery(answers);
+                var para = {
+                    lookup: query,
+                    collum: "Ort",
+                    mode: "LIKE",
+                    table: "region",
+                    limit: 10
+                    };
             }
-        }).catch(error => console.log('Error:', error));
-    }
+        
+            SQL.lookup(para).then(function(getCoronaDetail) {
+                let idcount = 0;
+                if(Object.entries(getCoronaDetail).length === 0){
+                    answers.addArticle({
+                        id: 'Not found',
+                        title: 'Leider habe ich keine Information über:',
+                        description: query,
+                        message_text: ("Leider habe ich keine Information über den angegebenen Ort " + query)
+                    });
+                    return bot.answerQuery(answers);
+                }else{
+                    getCoronaDetail.map((getCoronaDetail) => {
+
+                        if(getCoronaDetail.TimeStamp === "123456789"){
+                            var formattedTime = "Unbekannt"
+                        }else{
+        
+                        var date = new Date(getCoronaDetail.TimeStamp * 1000)
+                        var year = date.getFullYear()
+                        var month = date.getMonth() + 1
+                        var day = date.getDate()
+                        var hours = date.getHours();
+                        var minutes = "0" + date.getMinutes();
+                
+                        var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
+                        }
+                        let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
+        
+                        answers.addArticle({
+                            id: idcount,
+                            title: getCoronaDetail.Ort,
+                            description: getCoronaDetail.Bundesland,
+                            message_text: MessageOut,
+                            parse_mode: 'html',
+                            disable_web_page_preview: true
+                        });
+                        idcount++;
+                    });
+                    return bot.answerQuery(answers);
+                }
+            }).catch(error => console.log('Error:', error));
+        }
+}
 });
 
 /*----------------------Callback for Buttons--------------------------*/
@@ -153,7 +221,7 @@ bot.on('callbackQuery', (msg) => {
         let MSG = "Corona Deutschland:\n";
         Datenquellen.getCoronaDetail(true).then(function(Corona) {
             Corona.map((Corona) =>{
-                MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
+                MSG = MSG + Corona.Bundesland + ":\n" + numberWithCommas(Corona.confirmed) + " 🦠| " + numberWithCommas(Corona.recovered) + " 💚| " + numberWithCommas(Corona.deaths) + " ⚰️\n\n";
             });
 
             
@@ -191,7 +259,7 @@ bot.on('callbackQuery', (msg) => {
         let MSG = "Corona Deutschland:\n";
         Datenquellen.getCoronaDetail(false).then(function(Corona) {
             Corona.map((Corona) =>{
-                MSG = MSG + Corona.Bundesland + ":\n" + Corona.confirmed + " 🦠| " + Corona.recovered + " 💚| " + Corona.deaths + " ⚰️\n\n";
+                MSG = MSG + Corona.Bundesland + ":\n" + numberWithCommas(Corona.confirmed) + " 🦠| " + numberWithCommas(Corona.recovered) + " 💚| " + numberWithCommas(Corona.deaths) + " ⚰️\n\n";
             });
 
             
@@ -238,7 +306,7 @@ bot.on('callbackQuery', (msg) => {
             var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
     
     
-            let MSG = "Corona Deutschland:\n- Bestätigt: " + Corona.confirmed + " 🦠\n- Wieder gesund: " + Corona.recovered + " 💚\n- Todesfälle: " + Corona.deaths + " ⚰️\n\nStand: ***" + formattedTime + "***";
+            let MSG = "Corona Deutschland:\n- Bestätigt: " + numberWithCommas(Corona.confirmed) + " 🦠\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️\n\nStand: ***" + formattedTime + "***";
 
             if ('inline_message_id' in msg) {
                 bot.editMessageText(
@@ -319,12 +387,12 @@ setInterval(function(){
 
                 var MSGBundesländer = "";
                     Corona.Bundesländer.map((Bundesländer) =>{
-                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + Bundesländer.confirmed + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + Bundesländer.recovered + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + Bundesländer.deaths + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
+                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + numberWithCommas(Bundesländer.confirmed) + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + numberWithCommas(Bundesländer.recovered) + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + numberWithCommas(Bundesländer.deaths) + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
                     });
 
                 var formattedTime = day + "." + month + "." + year
 
-                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + Corona.confirmed + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + Corona.recovered + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + Corona.deaths + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
+                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (+" + Corona.deathsdiff + ")</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 					bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
@@ -354,7 +422,7 @@ setInterval(function(){
                     var minutes = "0" + date.getMinutes();
 
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + Corona.confirmed + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + Corona.recovered + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + Corona.deaths + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + numberWithCommas(Corona.confirmed) + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + numberWithCommas(Corona.recovered) + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + numberWithCommas(Corona.deaths) + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
 
                     fs.writeFile("./data/last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
@@ -371,7 +439,11 @@ setInterval(function(){
 
     if(UpdateDBMin === 5){
         SQL.updateDB().then(function(Output) {
-            f.log(Output.Text + " Es wurden " + Output.count + " eingelesen.")
+            f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Morgenpost")
+            UpdateDBMin = 0
+        });
+        SQL.updateDBRisklayer().then(function(Output) {
+            f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
             UpdateDBMin = 0
         });
     }else{
