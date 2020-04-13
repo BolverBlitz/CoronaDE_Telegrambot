@@ -79,10 +79,10 @@ bot.on('inlineQuery', msg => {
 
                         if(Object.entries(getCoronaDetail.QuelleURL).length === 0){
                             var QuelleTemp = "Quelle nicht als Link verfügbar"
-                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + getCoronaDetail.population + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: " + QuelleTemp + "\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + numberWithCommas(getCoronaDetail.population) + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: " + QuelleTemp + "\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
                         }else{
                             var QuelleTemp = "Link"
-                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + getCoronaDetail.population + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + QuelleTemp + "</a>\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + numberWithCommas(getCoronaDetail.population) + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + QuelleTemp + "</a>\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
                         }
         
                         answers.addArticle({
@@ -444,6 +444,11 @@ setInterval(function(){
     if(UpdateDBMin === 10){
         SQL.updateDB().then(function(Output) {
             f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Morgenpost")
+            UpdateDBMin = 0
+        }).catch(error => console.log('DB Update Error:', error));
+        
+        SQL.updateDBRisklayer().then(function(Output) {
+            f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
             UpdateDBMin = 0
         }).catch(error => console.log('DB Update Error:', error));
     }else{
