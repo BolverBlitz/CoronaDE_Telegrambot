@@ -16,15 +16,19 @@ const bot = new Telebot({
 SQL.updateDB().then(function(Output) {
     f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Morgenpost")
     UpdateDBMin = 0
-});
+}).catch(error => console.log('DB Update Error:', error));
 
 SQL.updateDBRisklayer().then(function(Output) {
     f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
     UpdateDBMin = 0
-});
+}).catch(error => console.log('DB Update Error:', error));
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function Round3Dec(num){
+    return Math.round(num * 1000) / 1000
 }
 
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen']
@@ -75,16 +79,16 @@ bot.on('inlineQuery', msg => {
 
                         if(Object.entries(getCoronaDetail.QuelleURL).length === 0){
                             var QuelleTemp = "Quelle nicht als Link verfügbar"
-                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: " + QuelleTemp + "\nStand: <b>" + formattedTime + "</b>";
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + getCoronaDetail.population + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: " + QuelleTemp + "\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
                         }else{
                             var QuelleTemp = "Link"
-                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + QuelleTemp + "</a>\nStand: <b>" + formattedTime + "</b>";
+                            var MessageOut = "<b>" + getCoronaDetail.Ort + "</b>\nEinwohner: " + getCoronaDetail.population + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec(getCoronaDetail.confirmed/getCoronaDetail.population) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec(getCoronaDetail.recovered/getCoronaDetail.population) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec(getCoronaDetail.deaths/getCoronaDetail.population) + "%)\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + QuelleTemp + "</a>\n<b>BETA MODUS</b>\nStand: <b>" + formattedTime + "</b>";
                         }
         
                         answers.addArticle({
                             id: idcount,
                             title: getCoronaDetail.Ort,
-                            //description: getCoronaDetail.Bundesland,
+                            description: "Einwohner: " + getCoronaDetail.population,
                             message_text: MessageOut,
                             parse_mode: 'html',
                             disable_web_page_preview: true
@@ -437,15 +441,11 @@ setInterval(function(){
      }
     }).catch(error => console.log('getCorona Error:', error));
 
-    if(UpdateDBMin === 5){
+    if(UpdateDBMin === 10){
         SQL.updateDB().then(function(Output) {
             f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Morgenpost")
             UpdateDBMin = 0
-        });
-        SQL.updateDBRisklayer().then(function(Output) {
-            f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
-            UpdateDBMin = 0
-        });
+        }).catch(error => console.log('DB Update Error:', error));
     }else{
         UpdateDBMin++
     }
@@ -499,4 +499,11 @@ bot.on(/^\/inline$/i, (msg) => {
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaOhne.mp4")
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaStadt.mp4")
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaBundeland.mp4")
+});
+
+bot.on(/^\/updateRisk$/i, (msg) => {
+    SQL.updateDBRisklayer().then(function(Output) {
+        f.log(Output.Text + " Es wurden " + Output.count + " eingelesen von Risklayer")
+        UpdateDBMin = 0
+    }).catch(error => console.log('DB Update Error:', error));
 });

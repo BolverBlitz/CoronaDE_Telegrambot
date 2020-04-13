@@ -1,8 +1,9 @@
-const url = "https://funkeinteraktiv.b-cdn.net/current.v3.csv";
+const url = "https://funkeinteraktiv.b-cdn.net/current.v4.csv";
 const RKIurl = 'https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=OBJECTID&resultOffset=0&resultRecordCount=1000&cacheHint=true'
 const RiskLayer = 'http://www.risklayer-explorer.com/media/data/events/Germany_20200321v2.csv'
 
 const request = require("request");
+var fs = require("fs"); //Debugging
 
 var config = require("../config");
 var mysql = require("mysql");
@@ -20,7 +21,6 @@ var db = mysql.createPool({
 function cleanString(input) {
 	var output = "";
     for (var i=0; i<input.length; i++) {
-		console.log(input.charCodeAt(i))
         if (input.charCodeAt(i) <= 127 || input.charCodeAt(i) === 223 || input.charCodeAt(i) === 252 || input.charCodeAt(i) === 228 || input.charCodeAt(i) === 246 || input.charCodeAt(i) === 196 || input.charCodeAt(i) === 214 || input.charCodeAt(i) === 220) {
             output += input.charAt(i);
         }
@@ -57,7 +57,6 @@ let updateDB = function() {
 										}
 										let Quelle = tempBarr[15].replace(/["]/g,'',)
 										let sqlcmdadduserv = [[TimeTemp, tempBarr[3], tempBarr[2], Quelle, tempBarr[16], tempBarr[12], tempBarr[13], tempBarr[14]]];
-										
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
 											if (err) { throw err; }
@@ -88,13 +87,14 @@ let updateDBRisklayer = function() {
 					};
 
 					let Barr = body.split("\n")
+					
 					for (i = 1; i < Barr.length-1 ; i++) { 
 						let tempBarr =  Barr[i].split(",");
 						var DateTimeTemp = tempBarr[10].replace(/["]/g,'',) + tempBarr[11].replace(/["]/g,'',);
 						var DateTimeTemp = DateTimeTemp.split(" ");
 						var DateTemp = DateTimeTemp[0].split("-");
 						var TimeTemp = DateTimeTemp[1].split(":");
-						var newDate = DateTemp[1] + "/" + DateTemp[2] + "/" + DateTemp[0];
+						var newDate = DateTemp[0] + "/" + DateTemp[1] + "/" + DateTemp[2];
 
 						if(tempBarr[12].includes('"')){
 							var TempUrl = tempBarr[14]
@@ -104,7 +104,6 @@ let updateDBRisklayer = function() {
 
 						var TimeDoneUnix = new Date(newDate).getTime() + TimeTemp[0] * 60 * 60 * 1000 + TimeTemp[1] * 60 * 1000 + 00 * 1000 + 60 * 60 * 1000;
 						let sqlcmdadduserv = [[TimeDoneUnix/1000, tempBarr[2], TempUrl, tempBarr[4], tempBarr[5], tempBarr[6], tempBarr[8]]];	
-						
 						connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 							//console.log(sqlcmdadduserv)
 							if (err) { throw err; }
