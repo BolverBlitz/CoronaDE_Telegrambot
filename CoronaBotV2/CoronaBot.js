@@ -43,8 +43,8 @@ bot.on('inlineQuery', msg => {
     let query = msg.query;
     let queryarr = query.split('');
     queryBetaArr = query.split(' ');
-    const answers = bot.answerList(msg.id, {cacheTime: 1});
-    if(queryBetaArr[0] === "beta" || queryBetaArr[0] === "Beta"){
+    const answers = bot.answerList(msg.id, { cacheTime: 1 });
+    if (queryBetaArr[0] === "beta" || queryBetaArr[0] === "Beta" || queryBetaArr[0] === "BETA") {
         if(queryBetaArr[1] === undefined){queryBetaArr[1] = " "}; //Fix for .trim() error in SQL.js
         
         var para = {
