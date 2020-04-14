@@ -129,9 +129,9 @@ let getCorona24 = function getCorona24() {
                         if(bodyarr[i+1] === "null"){
                             if(bodyarr[i+2] === "Deutschland"){
 								//console.log(i)
-                                confirmed = parseInt(bodyarr[i+12])
-                                recovered = parseInt(bodyarr[i+13])
-                                deaths = parseInt(bodyarr[i+14])
+                                confirmed = parseInt(bodyarr[i+13])
+                                recovered = parseInt(bodyarr[i+14])
+                                deaths = parseInt(bodyarr[i+15])
                             }
                         }
                     }

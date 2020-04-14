@@ -56,7 +56,7 @@ let updateDB = function() {
 											var TimeTemp = tempBarr[10]/1000;
 										}
 										let Quelle = tempBarr[15].replace(/["]/g,'',)
-										let sqlcmdadduserv = [[TimeTemp, tempBarr[3], tempBarr[2], Quelle, tempBarr[16], tempBarr[12], tempBarr[13], tempBarr[14]]];
+										let sqlcmdadduserv = [[TimeTemp, tempBarr[3], tempBarr[2], Quelle, tempBarr[16], tempBarr[13], tempBarr[14], tempBarr[15]]];
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
 											if (err) { throw err; }
