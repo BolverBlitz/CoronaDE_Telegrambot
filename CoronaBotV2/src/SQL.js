@@ -53,9 +53,9 @@ let updateDB = function() {
 										if(tempBarr[4] === "NaN"){
 											var TimeTemp = "123456789";
 										}else{
-											var TimeTemp = tempBarr[10]/1000;
+											var TimeTemp = tempBarr[11]/1000;
 										}
-										let Quelle = tempBarr[15].replace(/["]/g,'',)
+										let Quelle = tempBarr[16].replace(/["]/g,'',)
 										let sqlcmdadduserv = [[TimeTemp, tempBarr[3], tempBarr[2], Quelle, tempBarr[16], tempBarr[13], tempBarr[14], tempBarr[15]]];
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
