@@ -28,10 +28,10 @@ let getCorona = function getCorona() {
                     if(bodyarr[i].indexOf("de") >= 0){
                         if(bodyarr[i+1] === "null"){
                             if(bodyarr[i+2] === "Deutschland"){
-                                confirmed = parseInt(bodyarr[i+12])
-                                recovered = parseInt(bodyarr[i+13])
-                                deaths = parseInt(bodyarr[i+14])
-                                StandZeit = parseInt(bodyarr[i+10])
+                                confirmed = parseInt(bodyarr[i+13])
+                                recovered = parseInt(bodyarr[i+14])
+                                deaths = parseInt(bodyarr[i+15])
+                                StandZeit = parseInt(bodyarr[i+11])
                             }
                         }
                     }

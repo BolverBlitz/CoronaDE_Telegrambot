@@ -88,7 +88,7 @@ bot.on('inlineQuery', msg => {
                         answers.addArticle({
                             id: idcount,
                             title: getCoronaDetail.Ort,
-                            description: "Einwohner: " + getCoronaDetail.population,
+                            description: "Einwohner: " + numberWithCommas(getCoronaDetail.population),
                             message_text: MessageOut,
                             parse_mode: 'html',
                             disable_web_page_preview: true
