@@ -90,28 +90,33 @@ let updateDBRisklayer = function() {
 					
 					for (i = 1; i < Barr.length-1 ; i++) { 
 						let tempBarr =  Barr[i].split(",");
-						var DateTimeTemp = tempBarr[10].replace(/["]/g,'',) + tempBarr[11].replace(/["]/g,'',);
-						var DateTimeTemp = DateTimeTemp.split(" ");
-						var DateTemp = DateTimeTemp[0].split("-");
-						var TimeTemp = DateTimeTemp[1].split(":");
-						var newDate = DateTemp[0] + "/" + DateTemp[1] + "/" + DateTemp[2];
+						if(tempBarr.length >= 16){
+						
+							var DateTimeTemp = tempBarr[10].replace(/["]/g,'',) + tempBarr[11].replace(/["]/g,'',);
+							var DateTimeTemp = DateTimeTemp.split(" ");
+							var DateTemp = DateTimeTemp[0].split("-");
+							var TimeTemp = DateTimeTemp[1].split(":");
+							var newDate = DateTemp[0] + "/" + DateTemp[1] + "/" + DateTemp[2];
 
-						if(tempBarr[12].includes('"')){
-							var TempUrl = tempBarr[14]
+							if(tempBarr[12].includes('"')){
+								var TempUrl = tempBarr[14]
+							}else{
+								var TempUrl = tempBarr[13]
+							}
+
+							var TimeDoneUnix = new Date(newDate).getTime() + TimeTemp[0] * 60 * 60 * 1000 + TimeTemp[1] * 60 * 1000 + 00 * 1000 + 60 * 60 * 1000;
+							let sqlcmdadduserv = [[TimeDoneUnix/1000, tempBarr[2], TempUrl, tempBarr[4], tempBarr[5], tempBarr[6], tempBarr[8]]];	
+							connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
+								//console.log(sqlcmdadduserv)
+								if (err) { throw err; }
+							});			
+							out.count++;
 						}else{
-							var TempUrl = tempBarr[13]
+							console.log("Fehlerhafte Zeile" + i);
 						}
-
-						var TimeDoneUnix = new Date(newDate).getTime() + TimeTemp[0] * 60 * 60 * 1000 + TimeTemp[1] * 60 * 1000 + 00 * 1000 + 60 * 60 * 1000;
-						let sqlcmdadduserv = [[TimeDoneUnix/1000, tempBarr[2], TempUrl, tempBarr[4], tempBarr[5], tempBarr[6], tempBarr[8]]];	
-						connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
-							//console.log(sqlcmdadduserv)
-							if (err) { throw err; }
-						});			
-						out.count++;
 					}
-					connection.release();
-					resolve(out);
+						connection.release();
+						resolve(out);
 				});
 			});
 	});
