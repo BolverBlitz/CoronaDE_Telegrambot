@@ -499,10 +499,10 @@ bot.on(/^\/ask(.+)$/i, (msg, props) => {
 });
 
 bot.on(/^\/inline$/i, (msg) => {
-    msg.reply.text("Hier ein paar GIFs zur erklärung ;)")
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaOhne.mp4")
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaStadt.mp4")
     bot.sendVideo(msg.chat.id, "http://v1.bolverblitz.net/TGBotMedia/CoronaBundeland.mp4")
+    msg.reply.text("Hier ein paar GIFs zur erklärung ;)\n\nMit @Corona_DEBot beta <Stadt> kann man die Risklayer als Quelle nutzen\nBeispiel: @Corona_DEBot beta Nürnberg")
 });
 
 bot.on(/^\/updateRisk$/i, (msg) => {
