@@ -28,6 +28,17 @@ function cleanString(input) {
     return output;
 }
 
+function GetCSVPositionMP(KeyString) {
+    ErsteZeileMorgenpostArr = ErsteZeileMorgenpost.split(',');
+    return ErsteZeileMorgenpostArr.indexOf(KeyString)
+}
+function GetCSVPositionRL(KeyString) {
+    ErsteZeileRisklayerArr = ErsteZeileRisklayer.split(',');
+    return ErsteZeileRisklayerArr.indexOf(KeyString)
+}
+
+var ErsteZeileMorgenpost = "";
+var ErsteZeileRisklayer = "";
 const BundesländerKürtzel = ['de.bw','de.by','de.be','de.bb','de.hb','de.he','de.mv','de.hh','de.nd','de.nw','de.rp','de.sl','de.sn','de.st','de.sh','de.th']
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen', 'nicht-zugeordnet']
 
@@ -45,18 +56,19 @@ let updateDB = function() {
 					let Barr = body.split("\n")
 
 					for (i = 1; i < Barr.length-1 ; i++) { 
+						ErsteZeileMorgenpost = Barr[0]
 						let tempBarr =  Barr[i].split(",");
 						BundesländerKürtzel.map((BundesländerKürtzelMap) =>{
-							if(tempBarr[1].includes(BundesländerKürtzelMap)){
+							if(tempBarr[GetCSVPositionMP("parent")].includes(BundesländerKürtzelMap)){
 								BundesländerArray.map((BundesländerArrayMap) =>{
-									if(tempBarr[3].includes(BundesländerArrayMap)){
-										if(tempBarr[4] === "NaN"){
+									if(tempBarr[GetCSVPositionMP("label_parent")].includes(BundesländerArrayMap)){
+										if(tempBarr[GetCSVPositionMP("label_en")] === "NaN"){
 											var TimeTemp = "123456789";
 										}else{
-											var TimeTemp = tempBarr[11]/1000;
+											var TimeTemp = tempBarr[GetCSVPositionMP("updated")]/1000;
 										}
-										let Quelle = tempBarr[16].replace(/["]/g,'',)
-										let sqlcmdadduserv = [[TimeTemp, tempBarr[3], tempBarr[2], Quelle, tempBarr[16], tempBarr[13], tempBarr[14], tempBarr[15]]];
+										let Quelle = tempBarr[GetCSVPositionMP("source")].replace(/["]/g,'',)
+										let sqlcmdadduserv = [[TimeTemp, tempBarr[GetCSVPositionMP("label_parent")], tempBarr[GetCSVPositionMP("label")], Quelle, tempBarr[GetCSVPositionMP("source_url")], tempBarr[GetCSVPositionMP("confirmed")], tempBarr[GetCSVPositionMP("recovered")], tempBarr[GetCSVPositionMP("deaths")]]];
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
 											if (err) { throw err; }
@@ -89,23 +101,24 @@ let updateDBRisklayer = function() {
 					let Barr = body.split("\n")
 					
 					for (i = 1; i < Barr.length-1 ; i++) { 
+						ErsteZeileRisklayer = Barr[0] //Wenn über 10, dann MUSS eins Addiert werden da 'data' in 2 teile geteilt wird.
 						let tempBarr =  Barr[i].split(",");
 						if(tempBarr.length >= 16){
 						
-							var DateTimeTemp = tempBarr[10].replace(/["]/g,'',) + tempBarr[11].replace(/["]/g,'',);
+							var DateTimeTemp = tempBarr[GetCSVPositionRL("Date")].replace(/["]/g,'',) + tempBarr[1+GetCSVPositionRL("Date")].replace(/["]/g,'',);
 							var DateTimeTemp = DateTimeTemp.split(" ");
 							var DateTemp = DateTimeTemp[0].split("-");
 							var TimeTemp = DateTimeTemp[1].split(":");
 							var newDate = DateTemp[0] + "/" + DateTemp[1] + "/" + DateTemp[2];
 
-							if(tempBarr[12].includes('"')){
-								var TempUrl = tempBarr[14]
+							if(tempBarr[1+GetCSVPositionRL("Source")].includes('"')){
+								var TempUrl = tempBarr[3+GetCSVPositionRL("Source")]
 							}else{
-								var TempUrl = tempBarr[13]
+								var TempUrl = tempBarr[2+GetCSVPositionRL("Source")]
 							}
 
 							var TimeDoneUnix = new Date(newDate).getTime() + TimeTemp[0] * 60 * 60 * 1000 + TimeTemp[1] * 60 * 1000 + 00 * 1000 + 60 * 60 * 1000;
-							let sqlcmdadduserv = [[TimeDoneUnix/1000, tempBarr[2], TempUrl, tempBarr[4], tempBarr[5], tempBarr[6], tempBarr[8]]];	
+							let sqlcmdadduserv = [[TimeDoneUnix/1000, tempBarr[GetCSVPositionRL("Name")], TempUrl, tempBarr[GetCSVPositionRL("Cumulative")], tempBarr[GetCSVPositionRL("Recovered")], tempBarr[GetCSVPositionRL("Dead")], tempBarr[GetCSVPositionRL("Population")]]];	
 							connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 								//console.log(sqlcmdadduserv)
 								if (err) { throw err; }
