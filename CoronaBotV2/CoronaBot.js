@@ -177,12 +177,12 @@ bot.on('inlineQuery', msg => {
                 
                         var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
                         }
-                        let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\n\nEinwohner: " + numberWithCommas(getCoronaDetail.population) + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec((getCoronaDetail.confirmed/getCoronaDetail.population)*100) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec((getCoronaDetail.recovered/getCoronaDetail.population)*100) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec((getCoronaDetail.deaths/getCoronaDetail.population)*100) + "%)\n\nAktuell Erkrankte: " + numberWithCommas(parseInt(getCoronaDetail.confirmed)-(parseInt(getCoronaDetail.recovered)+parseInt(getCoronaDetail.deaths))) + " 🤧\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
+                        let MessageOut = "<b>" + getCoronaDetail.Ort + "</b> (<i>" + getCoronaDetail.Bundesland + "</i>)\nEinwohner: " + numberWithCommas(getCoronaDetail.population) + "\n\n - Bestätigt: " + numberWithCommas(getCoronaDetail.confirmed) + " 🦠 (" + Round3Dec((getCoronaDetail.confirmed/getCoronaDetail.population)*100) + "%)\n - Wieder gesund: " + numberWithCommas(getCoronaDetail.recovered) + " 💚(" + Round3Dec((getCoronaDetail.recovered/getCoronaDetail.population)*100) + "%)\n - Todesfälle: " + numberWithCommas(getCoronaDetail.deaths) + " ⚰️(" + Round3Dec((getCoronaDetail.deaths/getCoronaDetail.population)*100) + "%)\n\nAktuell Erkrankte: " + numberWithCommas(parseInt(getCoronaDetail.confirmed)-(parseInt(getCoronaDetail.recovered)+parseInt(getCoronaDetail.deaths))) + " 🤧\n\nQuelle: <a href='" + getCoronaDetail.QuelleURL + "'>" + getCoronaDetail.Quelle + "</a>\nStand: <b>" + formattedTime + "</b>";
                                          
                         answers.addArticle({
                             id: idcount,
                             title: getCoronaDetail.Ort,
-                            description: getCoronaDetail.Bundesland + ", Einwohner: " + getCoronaDetail.population,
+                            description: getCoronaDetail.Bundesland + ", Einwohner: " + numberWithCommas(getCoronaDetail.population),
                             message_text: MessageOut,
                             parse_mode: 'html',
                             disable_web_page_preview: true
