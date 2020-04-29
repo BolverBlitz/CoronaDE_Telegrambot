@@ -6,8 +6,15 @@ var secret = require("../secret");
 const util = require('util');
 var fs = require("fs");
 
+var ErsteZeile = "";
 const BundesländerKürtzel = ['de.bw','de.by','de.be','de.bb','de.hb','de.he','de.mv','de.hh','de.nd','de.nw','de.rp','de.sl','de.sn','de.st','de.sh','de.th']
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen', 'nicht-zugeordnet']
+
+function GetCSVPosition(KeyString) {
+    ErsteZeileArr = ErsteZeile.split(',');
+    return ErsteZeileArr.indexOf(KeyString)
+}
+
 
 let getCorona = function getCorona() {
     return new Promise(function(resolve, reject) {
@@ -23,15 +30,17 @@ let getCorona = function getCorona() {
                 if (err) { reject(err) }
 
                 var bodyarr = body.split(',')
+                var bodyarrZeilen = body.split('\n')
+                ErsteZeile = bodyarrZeilen[0]
                 var StandZeit = 0;
                 for(var i = 0; i < bodyarr.length;i++){
                     if(bodyarr[i].indexOf("de") >= 0){
                         if(bodyarr[i+1] === "null"){
                             if(bodyarr[i+2] === "Deutschland"){
-                                confirmed = parseInt(bodyarr[i+13])
-                                recovered = parseInt(bodyarr[i+14])
-                                deaths = parseInt(bodyarr[i+15])
-                                StandZeit = parseInt(bodyarr[i+11])
+                                confirmed = parseInt(bodyarr[i+GetCSVPosition("confirmed")])
+                                recovered = parseInt(bodyarr[i+GetCSVPosition("recovered")])
+                                deaths = parseInt(bodyarr[i+GetCSVPosition("deaths")])
+                                StandZeit = parseInt(bodyarr[i+GetCSVPosition("updated")])
                             }
                         }
                     }
@@ -61,6 +70,8 @@ let getCorona24 = function getCorona24() {
         var Output = "";
         f.log("Pushed: getCorona24");
         request(url, (err, res, body) => {
+            var bodyarrZeilen = body.split('\n')
+            ErsteZeile = bodyarrZeilen[0]
             let CountLänder = 0;
             let confirmed = 0;
             let recovered = 0;
@@ -96,23 +107,23 @@ let getCorona24 = function getCorona24() {
                                 if(CountLänder >= 16){
                                     let temp = {
                                         Bundesland: "Unbekannter Standort",
-                                        confirmed: Number(Zeilerr[14]),
-                                        confirmeddiff: Number(Zeilerr[14]) - BundesländerAlt[tracker].confirmed,
-                                        recovered: Number(Zeilerr[15]),
-                                        recovereddiff: Number(Zeilerr[15]) - BundesländerAlt[tracker].recovered,
-                                        deaths: Number(Zeilerr[16]),
-                                        deathsdiff: Number(Zeilerr[16]) - BundesländerAlt[tracker].deaths
+                                        confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
+                                        confirmeddiff: Number(Zeilerr[1+GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
+                                        recovereddiff: Number(Zeilerr[1+GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[1+GetCSVPosition("deaths")]),
+                                        deathsdiff: Number(Zeilerr[1+GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
                                     }
                                     Bundesländer.push(temp);
                                 }else{
                                     let temp = {
-                                        Bundesland: Zeilerr[2],
-                                        confirmed: Number(Zeilerr[14]),
-                                        confirmeddiff: Number(Zeilerr[14]) - BundesländerAlt[tracker].confirmed,
-                                        recovered: Number(Zeilerr[15]),
-                                        recovereddiff: Number(Zeilerr[15]) - BundesländerAlt[tracker].recovered,
-                                        deaths: Number(Zeilerr[16]),
-                                        deathsdiff: Number(Zeilerr[16]) - BundesländerAlt[tracker].deaths
+                                        Bundesland: Zeilerr[GetCSVPosition("label")],
+                                        confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
+                                        confirmeddiff: Number(Zeilerr[1+GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
+                                        recovereddiff: Number(Zeilerr[1+GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[1+GetCSVPosition("deaths")]),
+                                        deathsdiff: Number(Zeilerr[1+GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
                                     }
                                     Bundesländer.push(temp);
                                 }
@@ -129,9 +140,9 @@ let getCorona24 = function getCorona24() {
                         if(bodyarr[i+1] === "null"){
                             if(bodyarr[i+2] === "Deutschland"){
 								//console.log(i)
-                                confirmed = parseInt(bodyarr[i+13])
-                                recovered = parseInt(bodyarr[i+14])
-                                deaths = parseInt(bodyarr[i+15])
+                                confirmed = parseInt(bodyarr[i+GetCSVPosition("confirmed")])
+                                recovered = parseInt(bodyarr[i+GetCSVPosition("recovered")])
+                                deaths = parseInt(bodyarr[i+GetCSVPosition("deaths")])
                             }
                         }
                     }
@@ -186,6 +197,8 @@ let getCoronaDetail = function getCoronaDetail(sort) {
         var Output = [];
         f.log("Pushed: getCoronaDetail");
         request(url, (err, res, body) => {
+            var bodyarrZeilen = body.split('\n')
+            ErsteZeile = bodyarrZeilen[0]
             var bodyarr = body.split('\n')
             bodyarr.map((Zeile) =>{
                 var Zeilerr = Zeile.split(',')
@@ -195,17 +208,17 @@ let getCoronaDetail = function getCoronaDetail(sort) {
                             if(CountLänder >= 16){
                                 var temp = {
                                     Bundesland: "Unbekannter Standort",
-                                    confirmed: Number(Zeilerr[14]),
-                                    recovered: Number(Zeilerr[15]),
-                                    deaths: Number(Zeilerr[16])
+                                    confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
+                                    recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
+                                    deaths: Number(Zeilerr[1+GetCSVPosition("deaths")])
                                 }
                                 Output.push(temp);
                             }else{
                                 let temp = {
-                                    Bundesland: Zeilerr[2],
-                                    confirmed: Number(Zeilerr[14]),
-                                    recovered: Number(Zeilerr[15]),
-                                    deaths: Number(Zeilerr[16])
+                                    Bundesland: Zeilerr[GetCSVPosition("label")],
+                                    confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
+                                    recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
+                                    deaths: Number(Zeilerr[1+GetCSVPosition("deaths")])
                                 }
                                 Output.push(temp);
                             }

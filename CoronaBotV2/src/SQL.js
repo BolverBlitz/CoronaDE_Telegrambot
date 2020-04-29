@@ -44,7 +44,7 @@ const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg'
 
 let updateDB = function() {
 	return new Promise(function(resolve, reject) {
-		let sqlcmdadduser = "REPLACE INTO region (TimeStamp, Bundesland, Ort, Quelle, QuelleURL, confirmed, recovered, deaths) VALUES ?";
+		let sqlcmdadduser = "REPLACE INTO region (TimeStamp, Bundesland, Ort, Quelle, QuelleURL, confirmed, recovered, deaths, population) VALUES ?";
 		request(url, { json: true }, (err, res, body) => {
 			if (err) { throw err; }
 			db.getConnection(function(err, connection){
@@ -68,7 +68,7 @@ let updateDB = function() {
 											var TimeTemp = tempBarr[GetCSVPositionMP("updated")]/1000;
 										}
 										let Quelle = tempBarr[GetCSVPositionMP("source")].replace(/["]/g,'',)
-										let sqlcmdadduserv = [[TimeTemp, tempBarr[GetCSVPositionMP("label_parent")], tempBarr[GetCSVPositionMP("label")], Quelle, tempBarr[GetCSVPositionMP("source_url")], tempBarr[GetCSVPositionMP("confirmed")], tempBarr[GetCSVPositionMP("recovered")], tempBarr[GetCSVPositionMP("deaths")]]];
+										let sqlcmdadduserv = [[TimeTemp, tempBarr[GetCSVPositionMP("label_parent")], tempBarr[GetCSVPositionMP("label")], Quelle, tempBarr[GetCSVPositionMP("source_url")], tempBarr[GetCSVPositionMP("confirmed")], tempBarr[GetCSVPositionMP("recovered")], tempBarr[GetCSVPositionMP("deaths")], tempBarr[GetCSVPositionMP("population")]]];
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
 											if (err) { throw err; }
@@ -139,7 +139,7 @@ let updateDBRisklayer = function() {
 let lookup = function(para) {
 	return new Promise(function(resolve, reject) {
 		if(para.table === "region"){
-			if(para.mode === "LIKE"){var sqlcmd = "SELECT TimeStamp, Bundesland, Ort, Quelle, QuelleURL, confirmed, recovered, deaths FROM region where " + para.collum + " LIKE '%" + cleanString(para.lookup.trim()) + "%' LIMIT " + para.limit;}
+			if(para.mode === "LIKE"){var sqlcmd = "SELECT TimeStamp, Bundesland, Ort, Quelle, QuelleURL, confirmed, recovered, deaths, population FROM region where " + para.collum + " LIKE '%" + cleanString(para.lookup.trim()) + "%' LIMIT " + para.limit;}
 			//if(para.mode === "EQUEL"){var sqlcmd = "SELECT Haltestellenname,VGNKennung,Ort FROM Haltestellen where " + para.collum + " ='" + para.lookup.trim() + "' LIMIT " + para.limit;}
 		}
 		if(para.table === "risklayer"){
