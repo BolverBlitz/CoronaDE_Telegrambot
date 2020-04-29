@@ -61,7 +61,7 @@ bot.on('inlineQuery', msg => {
                     answers.addArticle({
                         id: 'Not found',
                         title: 'Leider habe ich keine Information über:',
-                        description: query,
+                        description: queryBetaArr[1],
                         message_text: ("Leider habe ich keine Information über den angegebenen Ort " + query)
                     });
                     return bot.answerQuery(answers);
@@ -132,12 +132,12 @@ bot.on('inlineQuery', msg => {
             }).catch(error => console.log('inlineQuery Error:', error));
 
         }else{
-
             if(BundesländerArray.includes(query)){
                 var para = {
                     lookup: query,
                     collum: "Bundesland",
                     mode: "LIKE",
+                    table: "region",
                     limit: 35
                     };
             }else{
