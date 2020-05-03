@@ -403,7 +403,9 @@ setInterval(function(){
                     fs.writeFile("./data/last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         f.log("last24.csv was written...")
                     });
-                    
+                    fs.appendFile('./data/TäglicheStats.csv', Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths, function (err) {
+                        if (err) {console.log('getCorona Error:', err)}
+                    })
             }
         }).catch(error => console.log('getCorona24 Error:', error));
 	}
