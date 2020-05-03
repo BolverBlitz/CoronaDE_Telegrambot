@@ -6,7 +6,7 @@ t.me/CoronaStats_DE
 
 `npm i telebot mysql`
 
-Enter Telegram Bot Token in secret.json you also may want to chance Kanal ID in the code.
+Enter Telegram Bot Token in secret.json you also may want to change Kanal ID/Channel ID in the code.
 
 `node Setup.js`
 
