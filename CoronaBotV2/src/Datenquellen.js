@@ -53,8 +53,9 @@ let getCorona = function getCorona() {
                 recovereddiff: recovered - LTarr[1],
                 deaths: deaths,
                 deathsdiff: deaths - LTarr[2],
-                Zeit: LTarr[3], //Alter Wert des letzten Posts aus File
-                ZeitStempelAlt: LTarr[4]/1000,
+                krankealt: LTarr[3],
+                Zeit: LTarr[4], //Alter Wert des letzten Posts aus File
+                ZeitStempelAlt: LTarr[5]/1000,
                 ZeitStempel: StandZeit/1000 //Neuer höchster Wert der aktuellen Anfrage
                 };
                 fs.writeFile("./data/current.csv", confirmed + "," + recovered + "," + deaths + "," + new Date().getTime() + "," + StandZeit, (err) => {if (err) console.log(err);
