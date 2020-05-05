@@ -420,7 +420,9 @@ setInterval(function(){
 
                 if(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))-parseInt(Corona.krankealt) >= 0){
                     var KrankAltVorzeichen = "+"
-                }
+                }else{
+		    var KrankAltVorzeichen = ""
+		}
                     var Kranke = parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))
                     var date = new Date(Corona.ZeitStempel * 1000)
                     var year = date.getFullYear()
