@@ -403,7 +403,7 @@ setInterval(function(){
                     fs.writeFile("./data/last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         f.log("last24.csv was written...")
                     });
-                    fs.appendFile('./data/TäglicheStats.csv', Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths, function (err) {
+                    fs.appendFile('./data/TäglicheStats.csv', Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "\n", function (err) {
                         if (err) {console.log('getCorona Error:', err)}
                     })
             }
@@ -420,9 +420,7 @@ setInterval(function(){
 
                 if(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))-parseInt(Corona.krankealt) >= 0){
                     var KrankAltVorzeichen = "+"
-                }else{
-		    var KrankAltVorzeichen = ""
-		}
+                }
                     var Kranke = parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))
                     var date = new Date(Corona.ZeitStempel * 1000)
                     var year = date.getFullYear()
