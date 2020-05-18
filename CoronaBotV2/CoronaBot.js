@@ -3,6 +3,7 @@ var secret = require("./secret");
 const SQL = require("./src/SQL");
 const Datenquellen = require("./src/Datenquellen");
 const f = require("./src/funktions");
+const R0 = require("./src/R0");
 var fs = require("fs");
 const request = require('request');
 const util = require('util');
@@ -29,6 +30,15 @@ function numberWithCommas(x) {
 
 function Round3Dec(num){
     return Math.round(num * 1000) / 1000
+}
+
+function getDate(date) {
+	var year = date.getFullYear();
+	var month = date.getMonth() + 1;
+	month = (month < 10 ? "0" : "") + month;
+	var day  = date.getDate();
+	day = (day < 10 ? "0" : "") + day;
+    return `${day}.${month}.${year}`
 }
 
 const BundesländerArray = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen']
@@ -493,7 +503,7 @@ bot.on(/^\/ask$/i, (msg) => {
 });
 
 bot.on(/^\/ask(.+)$/i, (msg, props) => {
-	const Para = props.match[1].split(' ');
+	var Para = props.match[1].split(' ');
     var MSG = Para[1];
     for(var i = 2; i < Para.length;i++){
         MSG = MSG + " " + Para[i];
@@ -517,3 +527,27 @@ bot.on(/^\/updateRisk$/i, (msg) => {
         UpdateDBMin = 0
     }).catch(error => console.log('DB Update Error:', error));
 });
+
+bot.on(/^\/R0(.+)$/i, (msg, props) => {
+    var Para = props.match[1].split(' ');
+    var dateNow = new Date()
+    var Message = `R0 Wert der letzten ${Para[1]} Tage:\n\n`
+    var promises_Formel1 = [];
+    var promises_Formel2 = [];
+    for(let i = 0; i < Para[1]; i++){
+        promises_Formel1.push(R0.getR0Formel1(i))
+        promises_Formel2.push(R0.getR0Formel2(i))
+    }
+    Promise.all([promises_Formel1, promises_Formel2].flat())
+        .then((result) => {
+            for(let i = 0; i < result.length/2; i++){
+                Message = Message + `${getDate(new Date(new Date().getTime() - i*86400000 ))}: R0=${result[i]}%* R0=${result[i+result.length/2]}%** \n`;
+            }
+            Message = Message + `\n*Reff(t) = (N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7)\n**Reff(t)= ((N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7))/+N(t-4)`
+            msg.reply.text(Message)
+        })
+        
+
+});
+
+//getDate
