@@ -528,7 +528,8 @@ bot.on(/^\/updateRisk$/i, (msg) => {
     }).catch(error => console.log('DB Update Error:', error));
 });
 
-bot.on(/^\/R0(.+)$/i, (msg, props) => {
+bot.on(/^\/R0(.+)/i, (msg, props) => {
+    bot.deleteMessage(msg.chat.id, msg.message_id).catch(error => console.log('Delete MSG:', error.description));
     var Para = props.match[1].split(' ');
     var dateNow = new Date()
     var Message = `R0 Wert der letzten ${Para[1]} Tage:\n\n`
@@ -543,8 +544,12 @@ bot.on(/^\/R0(.+)$/i, (msg, props) => {
             for(let i = 0; i < result.length/2; i++){
                 Message = Message + `${getDate(new Date(new Date().getTime() - i*86400000 ))}: R0=${result[i]}%* R0=${result[i+result.length/2]}%** \n`;
             }
-            Message = Message + `\n*Reff(t) = (N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7)\n**Reff(t)= ((N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7))/+N(t-4)`
-            msg.reply.text(Message)
+            Message = Message + `\n*Reff(t) = (N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7)\n**Reff(t)= ((N(t)+N(t-1)+N(t-2)+N(t-3)/4)/+N(t-4)`
+            if(Message.length > 4096){
+                msg.reply.text("Die Nachricht war zu lang... Bitte weniger Tage angeben.")
+            }else{
+                msg.reply.text(Message)
+            }
         })
         
 
