@@ -61,7 +61,7 @@ let updateDB = function() {
 						ErsteZeileMorgenpost = Barr[0]
 						let tempBarr =  Barr[i].split(",");
 						BundesländerKürtzel.map((BundesländerKürtzelMap) =>{
-							if(tempBarr[GetCSVPositionMP("parent")].includes(BundesländerKürtzelMap)){
+							if(tempBarr[GetCSVPositionMP("parent")].includes(BundesländerKürtzelMap) && tempBarr[GetCSVPositionMP("id")] !== `${BundesländerKürtzelMap}.nicht-zugeordnet`){
 								BundesländerArray.map((BundesländerArrayMap) =>{
 									if(tempBarr[GetCSVPositionMP("label_parent")].includes(BundesländerArrayMap)){
 										if(tempBarr[GetCSVPositionMP("label_en")] === "NaN"){
@@ -75,7 +75,7 @@ let updateDB = function() {
 											//console.log(sqlcmdadduserv)
 											if (err) { throw err; }
 										});
-										
+											
 										out.count++;
 									}
 								});

@@ -408,7 +408,8 @@ setInterval(function(){
                     var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (+" + Corona.deathsdiff + ")\nAktuell Erkrankte: <b>" + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + "</b> 🤧</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
-					bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
+                    bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
+                    bot.sendMessage(-1001416156266, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001416156266 Corona Gruppe
                     
                     fs.writeFile("./data/last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         f.log("last24.csv was written...")
@@ -430,6 +431,8 @@ setInterval(function(){
 
                 if(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))-parseInt(Corona.krankealt) >= 0){
                     var KrankAltVorzeichen = "+"
+                }else{
+                    var KrankAltVorzeichen = ""
                 }
                     var Kranke = parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))
                     var date = new Date(Corona.ZeitStempel * 1000)
@@ -535,16 +538,19 @@ bot.on(/^\/R0(.+)/i, (msg, props) => {
     var Message = `R0 Wert der letzten ${Para[1]} Tage:\n\n`
     var promises_Formel1 = [];
     var promises_Formel2 = [];
+    var promises_Formel3 = [];
     for(let i = 0; i < Para[1]; i++){
         promises_Formel1.push(R0.getR0Formel1(i))
         promises_Formel2.push(R0.getR0Formel2(i))
+        promises_Formel3.push(R0.getR0Formel3(i))
     }
-    Promise.all([promises_Formel1, promises_Formel2].flat())
+    Promise.all([promises_Formel1, promises_Formel2, promises_Formel3].flat())
         .then((result) => {
-            for(let i = 0; i < result.length/2; i++){
-                Message = Message + `${getDate(new Date(new Date().getTime() - i*86400000 ))}: R0=${result[i]}%* R0=${result[i+result.length/2]}%** \n`;
+            console.log(result, result.length)
+            for(let i = 1; i < result.length/3+1; i++){
+                Message = Message + `${getDate(new Date(new Date().getTime() - i*86400000 ))}: R0=${result[i-1]}* R0=${result[i+Para[1]*1-1]}** R0=${result[i+Para[1]*2-1]}***\n`;
             }
-            Message = Message + `\n*Reff(t) = (N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7)\n**Reff(t)= ((N(t)+N(t-1)+N(t-2)+N(t-3)/4)/+N(t-4)`
+            Message = Message + `\n*Reff(t) = (N(t)+N(t-1)+N(t-2)+N(t-3) / N(t-4)+N(t-5)+N(t-6)+N(t-7)\n**Reff(t)= (N(t)+N(t-1)+N(t-2)+N(t-3)/N(t-4)+N(t-5)+N(t-6)+N(t-7)\n***Reff(t) = (N(t-0)+N(t-1)+N(t-2)+N(t-3)+N(t-4)+N(t-5)+N(t-6)) / (N(t-4)+N(t-5)+N(t-6)+N(t-7)+N(t-8)+N(t-9)+N(t-10))`
             if(Message.length > 4096){
                 msg.reply.text("Die Nachricht war zu lang... Bitte weniger Tage angeben.")
             }else{
