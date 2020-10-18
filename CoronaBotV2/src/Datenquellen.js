@@ -35,7 +35,7 @@ let getCorona = function getCorona() {
                 var StandZeit = 0;
                 for(var i = 0; i < bodyarr.length;i++){
                     if(bodyarr[i].indexOf("de") >= 0){
-                        if(bodyarr[i+1] === "null"){
+                        if(bodyarr[i+1] === ""){
                             if(bodyarr[i+2] === "Deutschland"){
                                 confirmed = parseInt(bodyarr[i+GetCSVPosition("confirmed")])
                                 recovered = parseInt(bodyarr[i+GetCSVPosition("recovered")])
@@ -138,7 +138,7 @@ let getCorona24 = function getCorona24() {
 				var bodyarr = body.split(',')
 				for(var i = 0; i < bodyarr.length;i++){
                     if(bodyarr[i].indexOf("de") >= 0){
-                        if(bodyarr[i+1] === "null"){
+                        if(bodyarr[i+1] === ""){
                             if(bodyarr[i+2] === "Deutschland"){
 								//console.log(i)
                                 confirmed = parseInt(bodyarr[i+GetCSVPosition("confirmed")])
