@@ -417,6 +417,9 @@ setInterval(function(){
                     fs.appendFile('./data/TäglicheStats.csv', Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "\n", function (err) {
                         if (err) {console.log('getCorona Error:', err)}
                     })
+                    SQL.genDailyFile().then(function(Output) {
+                        f.log(Output.Text + " Es wurden " + Output.count + " in das File von Morgenpost")
+                    }).catch(error => console.log('File Generator Error:', error));
             }
         }).catch(error => console.log('getCorona24 Error:', error));
 	}

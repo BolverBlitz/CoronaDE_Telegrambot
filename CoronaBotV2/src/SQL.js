@@ -89,6 +89,46 @@ let updateDB = function() {
 	});
 };
 
+let genDailyFile = function() {
+	return new Promise(function(resolve, reject) {
+		let StoreFile = "TimeStamp,Bundesland,Ort,confirmed,recovered,deaths,population\n";
+		request(url, { json: true }, (err, res, body) => {
+			if (err) { throw err; }
+				let out = {
+					Text: "File Morgenpost saved finished!",
+					count: 0
+					};
+
+					let Barr = body.split("\n")
+
+					for (i = 1; i < Barr.length-1 ; i++) { 
+						ErsteZeileMorgenpost = Barr[0]
+						let tempBarr =  Barr[i].split(",");
+						BundesländerKürtzel.map((BundesländerKürtzelMap) =>{
+							if(tempBarr[GetCSVPositionMP("parent")].includes(BundesländerKürtzelMap) && tempBarr[GetCSVPositionMP("id")] !== `${BundesländerKürtzelMap}.nicht-zugeordnet`){
+								BundesländerArray.map((BundesländerArrayMap) =>{
+									if(tempBarr[GetCSVPositionMP("label_parent")].includes(BundesländerArrayMap)){
+										if(tempBarr[GetCSVPositionMP("label_en")] === "NaN"){
+											var TimeTemp = "123456789";
+										}else{
+											var TimeTemp = tempBarr[GetCSVPositionMP("updated")]/1000;
+										}
+										StoreFile = StoreFile + `${TimeTemp},${tempBarr[GetCSVPositionMP("label_parent")]},${tempBarr[GetCSVPositionMP("label")]},${tempBarr[GetCSVPositionMP("confirmed")]},${tempBarr[GetCSVPositionMP("recovered")]},${tempBarr[GetCSVPositionMP("deaths")]},${tempBarr[GetCSVPositionMP("population")]}\n`
+											
+										out.count++;
+									}
+								});
+							}
+						});
+					}
+					fs.writeFile(`./data/${getDateTime(new Date())}-MP.csv`, StoreFile, (err) => {if (err) console.log(err);
+						resolve(out);
+                    });
+					
+			});
+	});
+};
+
 let updateDBRisklayer = function() {
 	return new Promise(function(resolve, reject) {
 		let sqlcmdadduser = "REPLACE INTO risklayer (TimeStamp, Ort, QuelleURL, confirmed, recovered, deaths, population) VALUES ?";
@@ -158,9 +198,36 @@ let lookup = function(para) {
 	});
 }
 
+/**
+ * Converts a date into string dd.mm.yyyy
+ * @param {Date} 
+ * @returns {String}
+ */
+let getDateTime = function getDateTime(date) {
+
+	var hour = date.getHours();
+	hour = (hour < 10 ? "0" : "") + hour;
+
+	var min  = date.getMinutes();
+	min = (min < 10 ? "0" : "") + min;
+
+	var sec  = date.getSeconds();
+	sec = (sec < 10 ? "0" : "") + sec;
+
+	var year = date.getFullYear();
+
+	var month = date.getMonth() + 1;
+	month = (month < 10 ? "0" : "") + month;
+
+	var day  = date.getDate();
+	day = (day < 10 ? "0" : "") + day;
+
+	return day + "-" + month + "-" + year;
+}
 
 module.exports = {
 	updateDB,
+	genDailyFile,
 	updateDBRisklayer,
 	lookup
 };
