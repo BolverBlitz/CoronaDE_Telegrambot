@@ -108,23 +108,23 @@ let getCorona24 = function getCorona24() {
                                 if(CountLänder >= 16){
                                     let temp = {
                                         Bundesland: "Unbekannter Standort",
-                                        confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
-                                        confirmeddiff: Number(Zeilerr[1+GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
-                                        recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
-                                        recovereddiff: Number(Zeilerr[1+GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
-                                        deaths: Number(Zeilerr[1+GetCSVPosition("deaths")]),
-                                        deathsdiff: Number(Zeilerr[1+GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
+                                        confirmed: Number(Zeilerr[GetCSVPosition("confirmed")]),
+                                        confirmeddiff: Number(Zeilerr[GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[GetCSVPosition("recovered")]),
+                                        recovereddiff: Number(Zeilerr[GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[GetCSVPosition("deaths")]),
+                                        deathsdiff: Number(Zeilerr[GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
                                     }
                                     Bundesländer.push(temp);
                                 }else{
                                     let temp = {
                                         Bundesland: Zeilerr[GetCSVPosition("label")],
-                                        confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
-                                        confirmeddiff: Number(Zeilerr[1+GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
-                                        recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
-                                        recovereddiff: Number(Zeilerr[1+GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
-                                        deaths: Number(Zeilerr[1+GetCSVPosition("deaths")]),
-                                        deathsdiff: Number(Zeilerr[1+GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
+                                        confirmed: Number(Zeilerr[GetCSVPosition("confirmed")]),
+                                        confirmeddiff: Number(Zeilerr[GetCSVPosition("confirmed")]) - BundesländerAlt[tracker].confirmed,
+                                        recovered: Number(Zeilerr[GetCSVPosition("recovered")]),
+                                        recovereddiff: Number(Zeilerr[GetCSVPosition("recovered")]) - BundesländerAlt[tracker].recovered,
+                                        deaths: Number(Zeilerr[GetCSVPosition("deaths")]),
+                                        deathsdiff: Number(Zeilerr[GetCSVPosition("deaths")]) - BundesländerAlt[tracker].deaths
                                     }
                                     Bundesländer.push(temp);
                                 }
@@ -209,17 +209,17 @@ let getCoronaDetail = function getCoronaDetail(sort) {
                             if(CountLänder >= 16){
                                 var temp = {
                                     Bundesland: "Unbekannter Standort",
-                                    confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
-                                    recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
-                                    deaths: Number(Zeilerr[1+GetCSVPosition("deaths")])
+                                    confirmed: Number(Zeilerr[GetCSVPosition("confirmed")]),
+                                    recovered: Number(Zeilerr[GetCSVPosition("recovered")]),
+                                    deaths: Number(Zeilerr[GetCSVPosition("deaths")])
                                 }
                                 Output.push(temp);
                             }else{
                                 let temp = {
                                     Bundesland: Zeilerr[GetCSVPosition("label")],
-                                    confirmed: Number(Zeilerr[1+GetCSVPosition("confirmed")]),
-                                    recovered: Number(Zeilerr[1+GetCSVPosition("recovered")]),
-                                    deaths: Number(Zeilerr[1+GetCSVPosition("deaths")])
+                                    confirmed: Number(Zeilerr[GetCSVPosition("confirmed")]),
+                                    recovered: Number(Zeilerr[GetCSVPosition("recovered")]),
+                                    deaths: Number(Zeilerr[GetCSVPosition("deaths")])
                                 }
                                 Output.push(temp);
                             }

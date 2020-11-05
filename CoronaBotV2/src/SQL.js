@@ -69,7 +69,8 @@ let updateDB = function() {
 										}else{
 											var TimeTemp = tempBarr[GetCSVPositionMP("updated")]/1000;
 										}
-										let Quelle = tempBarr[GetCSVPositionMP("source")].replace(/["]/g,'',)
+										//let Quelle = tempBarr[GetCSVPositionMP("source")].replace(/["]/g,'',)
+										let Quelle = "Morgenpost"
 										let sqlcmdadduserv = [[TimeTemp, tempBarr[GetCSVPositionMP("label_parent")], tempBarr[GetCSVPositionMP("label")], Quelle, tempBarr[GetCSVPositionMP("source_url")], tempBarr[GetCSVPositionMP("confirmed")], tempBarr[GetCSVPositionMP("recovered")], tempBarr[GetCSVPositionMP("deaths")], tempBarr[GetCSVPositionMP("population")]]];
 										connection.query(sqlcmdadduser, [sqlcmdadduserv], function(err, result) {
 											//console.log(sqlcmdadduserv)
