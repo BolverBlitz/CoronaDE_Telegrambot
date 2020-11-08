@@ -32,6 +32,15 @@ function Round3Dec(num){
     return Math.round(num * 1000) / 1000
 }
 
+function Vorzeichen(int) {
+    if(Number(int) > 0){
+        return `+${int}`
+    }else{
+        return `${int}`
+    }
+
+}
+
 function getDate(date) {
 	var year = date.getFullYear();
 	var month = date.getMonth() + 1;
@@ -400,12 +409,12 @@ setInterval(function(){
 
                 var MSGBundesländer = "";
                     Corona.Bundesländer.map((Bundesländer) =>{
-                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + numberWithCommas(Bundesländer.confirmed) + "</b> <b>(+" + Bundesländer.confirmeddiff + "</b>) 🦠 | <b>" + numberWithCommas(Bundesländer.recovered) + "</b> <b>(+" + Bundesländer.recovereddiff + "</b>) 💚 | <b>" + numberWithCommas(Bundesländer.deaths) + "</b> <b>(+" + Bundesländer.deathsdiff + "</b>) ⚰️\n\n"
+                        MSGBundesländer = MSGBundesländer + Bundesländer.Bundesland + "\n<b>" + numberWithCommas(Bundesländer.confirmed) + "</b> <b>(" + Vorzeichen(Bundesländer.confirmeddiff) + "</b>) 🦠 | <b>" + numberWithCommas(Bundesländer.recovered) + "</b> <b>(" + Vorzeichen(Bundesländer.recovereddiff) + "</b>) 💚 | <b>" + numberWithCommas(Bundesländer.deaths) + "</b> <b>(" + Vorzeichen(Bundesländer.deathsdiff) + "</b>) ⚰️\n\n"
                     });
 
                 var formattedTime = day + "." + month + "." + year
 
-                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (+" + Corona.confirmeddiff + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (+" + Corona.recovereddiff + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (+" + Corona.deathsdiff + ")\nAktuell Erkrankte: <b>" + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + "</b> 🤧</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
+                    var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (" + Vorzeichen(Corona.confirmeddiff) + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (" + Vorzeichen(Corona.recovereddiff) + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (" + Vorzeichen(Corona.deathsdiff) + ")\nAktuell Erkrankte: <b>" + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + "</b> 🤧</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
                     bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
@@ -446,7 +455,7 @@ setInterval(function(){
                     var minutes = "0" + date.getMinutes();
 
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
-                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + numberWithCommas(Corona.confirmed) + '</b> 🦠 (<b>+' + Corona.confirmeddiff + '</b>)\n- Wieder gesund: <b>' + numberWithCommas(Corona.recovered) + '</b> 💚 (<b>+' + Corona.recovereddiff + '</b>)\n- Todesfälle: <b>' + numberWithCommas(Corona.deaths) + '</b> ⚰️ (<b>+' + Corona.deathsdiff + '</b>)\n- Aktuell Erkrankte: <b>' + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + '</b> 🤧 (<b>' + KrankAltVorzeichen + numberWithCommas(parseInt(Kranke)-parseInt(Corona.krankealt)) + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
+                    var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + numberWithCommas(Corona.confirmed) + '</b> 🦠 (<b>' + Vorzeichen(Corona.confirmeddiff) + '</b>)\n- Wieder gesund: <b>' + numberWithCommas(Corona.recovered) + '</b> 💚 (<b>' + Vorzeichen(Corona.recovereddiff) + '</b>)\n- Todesfälle: <b>' + numberWithCommas(Corona.deaths) + '</b> ⚰️ (<b>' + Vorzeichen(Corona.deathsdiff) + '</b>)\n- Aktuell Erkrankte: <b>' + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + '</b> 🤧 (<b>' + KrankAltVorzeichen + numberWithCommas(parseInt(Kranke)-parseInt(Corona.krankealt)) + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
                     bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}).catch(error => console.log('Error:', error)); //-1001466291563 206921999
                     
                     
