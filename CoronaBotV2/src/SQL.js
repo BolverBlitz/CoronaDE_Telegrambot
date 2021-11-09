@@ -1,6 +1,7 @@
-const url = "https://funkeinteraktiv.b-cdn.net/current.v4.csv";
+const url = "https://interaktiv.morgenpost.de/data/corona/current.v4.csv";
 const RKIurl = 'https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=OBJECTID&resultOffset=0&resultRecordCount=1000&cacheHint=true'
-const RiskLayer = 'http://www.risklayer-explorer.com/media/data/events/Germany_20200321v2.csv'
+const RiskLayer = 'https://www.risklayer-explorer.com/media/data/events/Germany_20200321v2.csv'
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 const request = require("request");
 var fs = require("fs"); //Debugging

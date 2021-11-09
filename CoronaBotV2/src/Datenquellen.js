@@ -1,4 +1,4 @@
-var url = 'https://funkeinteraktiv.b-cdn.net/current.v4.csv'
+var url = 'https://interaktiv.morgenpost.de/data/corona/current.v4.csv'
 const request = require("request");
 const f = require("./funktions");
 var config = require("../config");
