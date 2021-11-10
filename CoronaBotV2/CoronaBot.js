@@ -416,9 +416,9 @@ setInterval(function(){
 
                     var MessageOut = '<u><b>Zusammenfassung letzte 24h</b></u>\n - - - - - - Übersicht Alle - - - - - - \n<pre language="c++">- Bestätigt: ' + numberWithCommas(Corona.confirmed) + " 🦠 (" + Vorzeichen(Corona.confirmeddiff) + ")\n- Wieder gesund: " + numberWithCommas(Corona.recovered) + " 💚 (" + Vorzeichen(Corona.recovereddiff) + ")\n- Todesfälle: " + numberWithCommas(Corona.deaths) + " ⚰️ (" + Vorzeichen(Corona.deathsdiff) + ")\nAktuell Erkrankte: <b>" + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + "</b> 🤧</pre>\n\n - - - - - - Bundesländer - - - - - - \n" + MSGBundesländer + "\n#TäglicherReport " + formattedTime;
                     
-                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001466291563 206921999
-                    bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
-                    bot.sendMessage(-1001416156266, MessageOut, { parseMode: 'html' , webPreview: false}); //-1001416156266 Corona Gruppe
+                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}).catch(error => console.log(error)); //-1001466291563 206921999
+                    //bot.sendMessage(-1001135132259, MessageOut, { parseMode: 'html' , webPreview: false});
+                    bot.sendMessage(-1001416156266, MessageOut, { parseMode: 'html' , webPreview: false}).catch(error => console.log(error)); //-1001416156266 Corona Gruppe
                     
                     fs.writeFile("./data/last24.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + new Date().getTime(), (err) => {if (err) console.log(err);
                         f.log("last24.csv was written...")

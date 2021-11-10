@@ -4,3 +4,6 @@
 
 /.vs/ProjectSettings.json
 *.sqlite
+CoronaBotV2/node_modules/
+CoronaBotV2/secret.json
+CoronaBotV2/package-lock.json

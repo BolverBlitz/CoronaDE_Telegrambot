@@ -95,7 +95,6 @@ let getCorona24 = function getCorona24() {
                     }
                     BundesländerAlt.push(temp);
                 };
-                //console.log(BundesländerAlt)
                 if (err) { reject(err) }
                 
                 var bodyarr = body.split('\n')
