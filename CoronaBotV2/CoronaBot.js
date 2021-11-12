@@ -456,7 +456,7 @@ setInterval(function(){
 
                     var formattedTime = day + "." + month + "." + year + " " + hours + ':' + minutes.substr(-2);
                     var MessageOut = 'Corona Deutschland:\n- Bestätigt: <b>' + numberWithCommas(Corona.confirmed) + '</b> 🦠 (<b>' + Vorzeichen(Corona.confirmeddiff) + '</b>)\n- Wieder gesund: <b>' + numberWithCommas(Corona.recovered) + '</b> 💚 (<b>' + Vorzeichen(Corona.recovereddiff) + '</b>)\n- Todesfälle: <b>' + numberWithCommas(Corona.deaths) + '</b> ⚰️ (<b>' + Vorzeichen(Corona.deathsdiff) + '</b>)\n- Aktuell Erkrankte: <b>' + numberWithCommas(parseInt(Corona.confirmed)-(parseInt(Corona.recovered)+parseInt(Corona.deaths))) + '</b> 🤧 (<b>' + KrankAltVorzeichen + numberWithCommas(parseInt(Kranke)-parseInt(Corona.krankealt)) + '</b>)\n\nStand: <b>' + formattedTime + '</b>';
-                    bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}).catch(error => console.log('Error:', error)); //-1001466291563 206921999
+                    //bot.sendMessage(-1001466291563, MessageOut, { parseMode: 'html' , webPreview: false}).catch(error => console.log('Error:', error)); //-1001466291563 206921999
                     
                     
                     fs.writeFile("./data/last.csv", Corona.confirmed + "," + Corona.recovered + "," + Corona.deaths + "," + Kranke + "," + new Date().getTime() + "," + Corona.ZeitStempel * 1000, (err) => {if (err) console.log(err);
