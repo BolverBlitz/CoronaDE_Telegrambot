@@ -4,7 +4,7 @@
   "description": "",
   "main": "CoronaBot.js",
   "dependencies": {
-    "express": "^4.17.2",
+    "express": "^4.17.3",
     "image-downloader": "^4.0.1",
     "mysql": "^2.18.1",
     "pm2": "^5.1.2",
